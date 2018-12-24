@@ -14,6 +14,7 @@
                 <MenuItem Header="_Open..." Command="{Binding DoTheThing}" />
                 <Separator/>
                 <MenuItem Header="_Exit"/>
+                <Image Source="{Binding CurrentImage}" />
             </MenuItem>
             <MenuItem Header="_Edit">
                 <MenuItem Header="Copy"/>
