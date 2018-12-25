@@ -1,28 +1,28 @@
-<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="clr-namespace:FuzzyComic.ViewModels;assembly=FuzzyComic"
-        Icon="resm:FuzzyComic.Assets.avalonia-logo.ico"
-        Title="FuzzyComic">
+<Window xmlns="https://github.com/avaloniaui" 
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+  xmlns:vm="clr-namespace:FuzzyComic.ViewModels;assembly=FuzzyComic" Icon="resm:FuzzyComic.Assets.avalonia-logo.ico" Title="FuzzyComic">
 
   <Design.DataContext>
     <vm:MainWindowViewModel/>
   </Design.DataContext>
-
-      <DockPanel>
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
-                <MenuItem Header="_Open..." Command="{Binding DoTheThing}" />
-                <Separator/>
-                <MenuItem Header="_Exit"/>
-                <Image Source="{Binding CurrentImage}" />
-            </MenuItem>
-            <MenuItem Header="_Edit">
-                <MenuItem Header="Copy"/>
-                <MenuItem Header="Paste"/>
-            </MenuItem>
-        </Menu>
+  <Grid RowDefinitions="15,100,1000">
+    <DockPanel Grid.Row="0" Grid.Column="0">
+      <Menu DockPanel.Dock="Top">
+        <MenuItem Header="_File">
+          <MenuItem Header="_Open..." Command="{Binding DoTheThing}" />
+          <Separator/>
+          <MenuItem Header="_Exit"/>
+        </MenuItem>
+        <MenuItem Header="_Edit">
+          <MenuItem Header="Copy"/>
+          <MenuItem Header="Paste"/>
+        </MenuItem>
+      </Menu>
     </DockPanel>
-  
-  <!--<TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>    -->
-  
+
+    <!--<Image Grid.Row="1" Grid.Column="0" Source="C:/Users/nate2/Documents/Projects/FuzzyComic/Assets/Page000.jpg" Width="500" Height="500" Stretch="Fill" Cursor="Hand" />-->
+    <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <Image Grid.Row="2" Grid.Column="0" Source="{Binding CurrentImage}" Width="500" Height="500" Stretch="Fill" Cursor="Hand" />
+  </Grid>
+
 </Window>
