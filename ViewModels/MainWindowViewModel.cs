@@ -12,7 +12,7 @@ using SkiaSharp;
 
 namespace FuzzyComic.ViewModels
 {
-    public class MainWindowViewModel : ViewModelBase
+    public class MainWindowViewModel : Window
     {
         public MainWindowViewModel()
         {
@@ -20,12 +20,13 @@ namespace FuzzyComic.ViewModels
             // DoTheThing = ReactiveCommand.Create(RunTheThing);
 
             Greeting = "Hello";
+            CurrentImage = new PageViewModel();
         }
         public string Greeting { get; private set; }
 
         public ReactiveCommand<Unit, Unit> DoTheThing { get; }
 
-        public Bitmap CurrentImage { get; private set; }
+        public PageViewModel CurrentImage { get; private set; }
 
         async Task RunTheThing()
         {
@@ -59,9 +60,7 @@ namespace FuzzyComic.ViewModels
 
                             var bitmap = new Bitmap(encoded.AsStream());
 
-                            System.Console.WriteLine(reader.Entry.Key);
-                            Greeting = reader.Entry.Key;
-                            CurrentImage = bitmap;
+                            CurrentImage.CurrentPage = bitmap;
                             break;
                         }
                     }

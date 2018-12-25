@@ -20,9 +20,9 @@
       </Menu>
     </DockPanel>
 
-    <!--<Image Grid.Row="1" Grid.Column="0" Source="C:/Users/nate2/Documents/Projects/FuzzyComic/Assets/Page000.jpg" Width="500" Height="500" Stretch="Fill" Cursor="Hand" />-->
     <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-    <Image Grid.Row="2" Grid.Column="0" Source="{Binding CurrentImage}" Width="500" Height="500" Stretch="Fill" Cursor="Hand" />
+    <Image Grid.Row="2" Grid.Column="0" Source="{Binding CurrentImage.CurrentPage}" Width="500" Height="500" Stretch="Fill" Cursor="Hand" />
+    <!--<Image Grid.Row="1" Grid.Column="0" Source="C:/Users/nate2/Documents/Projects/FuzzyComic/Assets/Page000.jpg" Width="500" Height="500" Stretch="Fill" Cursor="Hand" />-->
   </Grid>
 
 </Window>
