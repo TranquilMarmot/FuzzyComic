@@ -16,13 +16,21 @@ namespace FuzzyComic.ViewModels
     {
         public MainWindowViewModel()
         {
+            DoExit = ReactiveCommand.Create(RunExit);
             DoOpenComicFile = ReactiveCommand.CreateFromTask(RunOpenComicFile);
             CurrentPage = new PageViewModel();
         }
 
         public ReactiveCommand<Unit, Unit> DoOpenComicFile { get; }
 
+        public ReactiveCommand<Unit, Unit> DoExit { get; }
+
         public PageViewModel CurrentPage { get; private set; }
+
+        void RunExit()
+        {
+            System.Environment.Exit(0);
+        }
 
         async Task RunOpenComicFile()
         {

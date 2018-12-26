@@ -11,7 +11,7 @@
         <MenuItem Header="_File">
           <MenuItem Header="_Open..." Command="{Binding DoOpenComicFile}" />
           <Separator/>
-          <MenuItem Header="_Exit"/>
+          <MenuItem Header="_Exit" Command="{Binding DoExit}" />
         </MenuItem>
       </Menu>
     </DockPanel>
