@@ -5,7 +5,7 @@
     <vm:MainWindowViewModel/>
   </Design.DataContext>
 
-  <Grid RowDefinitions="Auto,Auto">
+  <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto">
     <DockPanel Grid.Row="0" Grid.Column="0">
       <Menu DockPanel.Dock="Top">
         <MenuItem Header="_File">
@@ -16,6 +16,7 @@
       </Menu>
     </DockPanel>
     <Image Grid.Row="2" Grid.Column="0" Source="{Binding CurrentPage.CurrentImage}" Cursor="Hand" />
+    <Button Grid.Row="2" Grid.Column="1" Command="{Binding DoNextPage}" Content="->" />
   </Grid>
 
 </Window>

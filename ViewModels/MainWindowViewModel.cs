@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using ReactiveUI;
-using SharpCompress.Readers;
+using SharpCompress.Archives;
 using SkiaSharp;
 
 namespace FuzzyComic.ViewModels
@@ -18,22 +18,51 @@ namespace FuzzyComic.ViewModels
         {
             DoExit = ReactiveCommand.Create(RunExit);
             DoOpenComicFile = ReactiveCommand.CreateFromTask(RunOpenComicFile);
+            DoNextPage = ReactiveCommand.CreateFromTask(RunNextPage);
             CurrentPage = new PageViewModel();
+            Closed += (object sender, EventArgs args) => CloseStreams();
         }
 
         public ReactiveCommand<Unit, Unit> DoOpenComicFile { get; }
 
         public ReactiveCommand<Unit, Unit> DoExit { get; }
 
+        public ReactiveCommand<Unit, Unit> DoNextPage { get; }
+
         public PageViewModel CurrentPage { get; private set; }
 
-        void RunExit()
+        private FileStream CurrentFileSteam { get; set; }
+
+        private IArchive CurrentArchive { get; set; }
+
+        private int CurrentPageIndex { get; set; }
+
+        private List<IArchiveEntry> CurrentEntryList { get; set; }
+
+        private void CloseStreams()
+        {
+            if (CurrentArchive != null)
+            {
+                CurrentArchive.Dispose();
+                CurrentArchive = null;
+            }
+
+            if (CurrentFileSteam != null)
+            {
+                CurrentFileSteam.Dispose();
+                CurrentFileSteam = null;
+            }
+        }
+
+        private void RunExit()
         {
             System.Environment.Exit(0);
         }
 
-        async Task RunOpenComicFile()
+        private async Task RunOpenComicFile()
         {
+            CloseStreams();
+
             var dialog = new OpenFileDialog();
             dialog.Title = "Pick a comic";
             dialog.AllowMultiple = false;
@@ -46,32 +75,68 @@ namespace FuzzyComic.ViewModels
             {
                 var chosenPath = result[0];
 
-                using (var fileStream = File.OpenRead(chosenPath))
-                using (var reader = ReaderFactory.Open(fileStream))
+                CurrentFileSteam = File.OpenRead(chosenPath);
+                CurrentArchive = ArchiveFactory.Open(CurrentFileSteam);
+                CurrentEntryList = EntriesToSortedList(CurrentArchive.Entries);
+
+                CurrentPageIndex = 0;
+                var entry = CurrentEntryList[CurrentPageIndex];
+                using (var entryStream = entry.OpenEntryStream())
                 {
-                    while (reader.MoveToNextEntry())
+                    if (!entry.IsDirectory)
                     {
-                        if (!reader.Entry.IsDirectory)
-                        {
-                            var entryStream = reader.OpenEntryStream();
-
-                            // SkiaSharp is the underlying image library that Avalonia uses, so we use that here
-                            // First, we have to decode the image into a bitmap
-                            // Then, re-encode that into an image (this is in case i.e. we have bmp or jpeg and need png)
-                            // Then create a bitmap from the stream of that encoded image...
-                            // This isn't the best or greatest thing ever, but it makes it so that we always have a compatible format
-                            var skiaBitmap = SKBitmap.Decode(entryStream); // TODO this returns null on error
-                            var skiaImage = SKImage.FromBitmap(skiaBitmap);
-                            var encoded = skiaImage.Encode();
-
-                            var bitmap = new Bitmap(encoded.AsStream());
-
-                            CurrentPage.CurrentImage = bitmap;
-                            break;
-                        }
+                        CurrentPage.CurrentImage = await DecodeEntryStream(entryStream);
                     }
                 }
             }
+        }
+
+        private async Task RunNextPage()
+        {
+            CurrentPageIndex++;
+            var entry = CurrentEntryList[CurrentPageIndex];
+            using (var entryStream = entry.OpenEntryStream())
+            {
+                if (!entry.IsDirectory)
+                {
+                    CurrentPage.CurrentImage = await DecodeEntryStream(entryStream);
+                }
+            }
+        }
+
+        List<IArchiveEntry> EntriesToSortedList(IEnumerable<IArchiveEntry> entries)
+        {
+            var list = new List<IArchiveEntry>();
+            foreach (var entry in entries)
+            {
+                list.Add(entry);
+            }
+
+            list.Sort((a, b) => a.Key.CompareTo(b.Key));
+            return list;
+        }
+
+        /// <summary>
+        /// Decodes a stream of an entry from an archive into a Bitmap that Avalonia can use
+        /// </summary>
+        /// <param name="entryStream">Stream to decode</param>
+        /// <returns>Task with finished decoded Bitmap</returns>
+        async Task<Bitmap> DecodeEntryStream(Stream entryStream)
+        {
+            return await Task.Run(() =>
+            {
+                // SkiaSharp is the underlying image library that Avalonia uses, so we use that here
+                // First, we have to decode the image into a Skia bitmap
+                // Then, re-encode that into a Skia image (this is in case i.e. we have bmp or jpeg and need png)
+                // Then create a bitmap from the stream of that encoded image...
+                // This isn't the most efficient thing ever, but it makes it so that we always have a compatible format
+                var skiaBitmap = SKBitmap.Decode(entryStream); // TODO this returns null on error
+                var skiaImage = SKImage.FromBitmap(skiaBitmap);
+                var encoded = skiaImage.Encode();
+
+                var bitmap = new Bitmap(encoded.AsStream());
+                return Task.FromResult(bitmap);
+            });
         }
     }
 }
