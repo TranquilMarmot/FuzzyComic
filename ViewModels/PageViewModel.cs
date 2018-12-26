@@ -10,7 +10,7 @@ namespace FuzzyComic.ViewModels
     {
         private Bitmap bitmap;
 
-        public Bitmap CurrentPage
+        public Bitmap CurrentImage
         {
             get { return bitmap; }
             set { this.RaiseAndSetIfChanged(ref this.bitmap, value); }

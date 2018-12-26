@@ -16,21 +16,16 @@ namespace FuzzyComic.ViewModels
     {
         public MainWindowViewModel()
         {
-            DoTheThing = ReactiveCommand.CreateFromTask(RunTheThing);
-            // DoTheThing = ReactiveCommand.Create(RunTheThing);
-
-            Greeting = "Hello";
-            CurrentImage = new PageViewModel();
+            DoOpenComicFile = ReactiveCommand.CreateFromTask(RunOpenComicFile);
+            CurrentPage = new PageViewModel();
         }
-        public string Greeting { get; private set; }
 
-        public ReactiveCommand<Unit, Unit> DoTheThing { get; }
+        public ReactiveCommand<Unit, Unit> DoOpenComicFile { get; }
 
-        public PageViewModel CurrentImage { get; private set; }
+        public PageViewModel CurrentPage { get; private set; }
 
-        async Task RunTheThing()
+        async Task RunOpenComicFile()
         {
-            Greeting = "Load that shit";
             var dialog = new OpenFileDialog();
             dialog.Title = "Pick a comic";
             dialog.AllowMultiple = false;
@@ -41,7 +36,6 @@ namespace FuzzyComic.ViewModels
             var result = await dialog.ShowAsync();
             if (result != null)
             {
-                System.Console.WriteLine("hello ello");
                 var chosenPath = result[0];
 
                 using (var fileStream = File.OpenRead(chosenPath))
@@ -53,14 +47,18 @@ namespace FuzzyComic.ViewModels
                         {
                             var entryStream = reader.OpenEntryStream();
 
-                            // TODO this returns null on error
-                            var skiaBitmap = SKBitmap.Decode(entryStream);
+                            // SkiaSharp is the underlying image library that Avalonia uses, so we use that here
+                            // First, we have to decode the image into a bitmap
+                            // Then, re-encode that into an image (this is in case i.e. we have bmp or jpeg and need png)
+                            // Then create a bitmap from the stream of that encoded image...
+                            // This isn't the best or greatest thing ever, but it makes it so that we always have a compatible format
+                            var skiaBitmap = SKBitmap.Decode(entryStream); // TODO this returns null on error
                             var skiaImage = SKImage.FromBitmap(skiaBitmap);
                             var encoded = skiaImage.Encode();
 
                             var bitmap = new Bitmap(encoded.AsStream());
 
-                            CurrentImage.CurrentPage = bitmap;
+                            CurrentPage.CurrentImage = bitmap;
                             break;
                         }
                     }

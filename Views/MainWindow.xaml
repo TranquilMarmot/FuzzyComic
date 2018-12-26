@@ -1,28 +1,21 @@
 <Window xmlns="https://github.com/avaloniaui" 
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-  xmlns:vm="clr-namespace:FuzzyComic.ViewModels;assembly=FuzzyComic" Icon="resm:FuzzyComic.Assets.avalonia-logo.ico" Title="FuzzyComic">
-
+  xmlns:vm="clr-namespace:FuzzyComic.ViewModels;assembly=FuzzyComic" Icon="resm:FuzzyComic.Assets.avalonia-logo.ico" Title="FuzzyComic" WindowState="Maximized" HasSystemDecorations="false">
   <Design.DataContext>
     <vm:MainWindowViewModel/>
   </Design.DataContext>
-  <Grid RowDefinitions="15,100,1000">
+
+  <Grid RowDefinitions="Auto,Auto">
     <DockPanel Grid.Row="0" Grid.Column="0">
       <Menu DockPanel.Dock="Top">
         <MenuItem Header="_File">
-          <MenuItem Header="_Open..." Command="{Binding DoTheThing}" />
+          <MenuItem Header="_Open..." Command="{Binding DoOpenComicFile}" />
           <Separator/>
           <MenuItem Header="_Exit"/>
         </MenuItem>
-        <MenuItem Header="_Edit">
-          <MenuItem Header="Copy"/>
-          <MenuItem Header="Paste"/>
-        </MenuItem>
       </Menu>
     </DockPanel>
-
-    <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-    <Image Grid.Row="2" Grid.Column="0" Source="{Binding CurrentImage.CurrentPage}" Width="500" Height="500" Stretch="Fill" Cursor="Hand" />
-    <!--<Image Grid.Row="1" Grid.Column="0" Source="C:/Users/nate2/Documents/Projects/FuzzyComic/Assets/Page000.jpg" Width="500" Height="500" Stretch="Fill" Cursor="Hand" />-->
+    <Image Grid.Row="2" Grid.Column="0" Source="{Binding CurrentPage.CurrentImage}" Cursor="Hand" />
   </Grid>
 
 </Window>
