@@ -5,6 +5,7 @@ using System.Reactive;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.LogicalTree;
 using Avalonia.Media.Imaging;
 using ReactiveUI;
 using SharpCompress.Archives;
@@ -12,15 +13,17 @@ using SkiaSharp;
 
 namespace FuzzyComic.ViewModels
 {
-    public class MainWindowViewModel : Window
+    public class MainWindowViewModel : Control
     {
         public MainWindowViewModel()
         {
             DoExit = ReactiveCommand.Create(RunExit);
             DoOpenComicFile = ReactiveCommand.CreateFromTask(RunOpenComicFile);
             DoNextPage = ReactiveCommand.CreateFromTask(RunNextPage);
+
             CurrentPage = new PageViewModel();
-            Closed += (object sender, EventArgs args) => CloseStreams();
+
+            this.DetachedFromLogicalTree += (object sender, LogicalTreeAttachmentEventArgs args) => CloseStreams();
         }
 
         public ReactiveCommand<Unit, Unit> DoOpenComicFile { get; }
@@ -38,6 +41,8 @@ namespace FuzzyComic.ViewModels
         private int CurrentPageIndex { get; set; }
 
         private List<IArchiveEntry> CurrentEntryList { get; set; }
+
+        public Button OpenComicButton { get; set; }
 
         private void CloseStreams()
         {
@@ -88,6 +93,7 @@ namespace FuzzyComic.ViewModels
                         CurrentPage.CurrentImage = await DecodeEntryStream(entryStream);
                     }
                 }
+                OpenComicButton.Classes.Add("hidden");
             }
         }
 

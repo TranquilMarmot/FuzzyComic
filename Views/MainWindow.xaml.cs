@@ -1,6 +1,8 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using FuzzyComic.ViewModels;
 
 namespace FuzzyComic.Views
 {
@@ -9,6 +11,11 @@ namespace FuzzyComic.Views
         public MainWindow()
         {
             InitializeComponent();
+            var openComicButton = this.FindControl<Button>("openComicButton");
+            DataContextChanged += (object sender, EventArgs wat) =>
+            {
+                ((MainWindowViewModel)this.DataContext).OpenComicButton = openComicButton;
+            };
         }
 
         private void InitializeComponent()

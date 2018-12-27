@@ -1,22 +1,36 @@
 <Window xmlns="https://github.com/avaloniaui" 
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-  xmlns:vm="clr-namespace:FuzzyComic.ViewModels;assembly=FuzzyComic" Icon="resm:FuzzyComic.Assets.avalonia-logo.ico" Title="FuzzyComic" WindowState="Maximized" HasSystemDecorations="false">
+  xmlns:vm="clr-namespace:FuzzyComic.ViewModels;assembly=FuzzyComic" 
+  Icon="resm:FuzzyComic.Assets.avalonia-logo.ico" 
+  Title="FuzzyComic" 
+  WindowState="Maximized" 
+  HasSystemDecorations="false">
   <Design.DataContext>
     <vm:MainWindowViewModel/>
   </Design.DataContext>
 
-  <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto">
-    <DockPanel Grid.Row="0" Grid.Column="0">
-      <Menu DockPanel.Dock="Top">
-        <MenuItem Header="_File">
-          <MenuItem Header="_Open..." Command="{Binding DoOpenComicFile}" />
-          <Separator/>
-          <MenuItem Header="_Exit" Command="{Binding DoExit}" />
-        </MenuItem>
-      </Menu>
-    </DockPanel>
-    <Image Grid.Row="2" Grid.Column="0" Source="{Binding CurrentPage.CurrentImage}" Cursor="Hand" />
-    <Button Grid.Row="2" Grid.Column="1" Command="{Binding DoNextPage}" Content="->" />
+  <Window.Styles>
+    <Style Selector="Button#openComicButton.hidden">
+      <Setter Property="IsVisible" 
+        Value="false"/>
+    </Style>
+  </Window.Styles>
+
+  <Grid RowDefinitions="Auto" 
+    ColumnDefinitions="Auto,Auto">
+    <Button Grid.Row="2" 
+      Grid.Column="0" 
+      Name="openComicButton" 
+      Content="Open Comic" 
+      Command="{Binding DoOpenComicFile}" />
+    <Image Grid.Row="2" 
+      Grid.Column="0" 
+      Source="{Binding CurrentPage.CurrentImage}" 
+      Cursor="Hand" />
+    <Button Grid.Row="2" 
+      Grid.Column="1" 
+      Command="{Binding DoNextPage}" 
+      Content="->" />
   </Grid>
 
 </Window>
