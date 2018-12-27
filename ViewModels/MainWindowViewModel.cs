@@ -20,6 +20,7 @@ namespace FuzzyComic.ViewModels
             DoExit = ReactiveCommand.Create(RunExit);
             DoOpenComicFile = ReactiveCommand.CreateFromTask(RunOpenComicFile);
             DoNextPage = ReactiveCommand.CreateFromTask(RunNextPage);
+            DoPreviousPage = ReactiveCommand.CreateFromTask(RunPreviousPage);
 
             CurrentPage = new PageViewModel();
 
@@ -31,6 +32,8 @@ namespace FuzzyComic.ViewModels
         public ReactiveCommand<Unit, Unit> DoExit { get; }
 
         public ReactiveCommand<Unit, Unit> DoNextPage { get; }
+
+        public ReactiveCommand<Unit, Unit> DoPreviousPage { get; }
 
         public PageViewModel CurrentPage { get; private set; }
 
@@ -85,14 +88,8 @@ namespace FuzzyComic.ViewModels
                 CurrentEntryList = EntriesToSortedList(CurrentArchive.Entries);
 
                 CurrentPageIndex = 0;
-                var entry = CurrentEntryList[CurrentPageIndex];
-                using (var entryStream = entry.OpenEntryStream())
-                {
-                    if (!entry.IsDirectory)
-                    {
-                        CurrentPage.CurrentImage = await DecodeEntryStream(entryStream);
-                    }
-                }
+                CurrentPage.CurrentImage = await LoadPage(CurrentPageIndex);
+
                 OpenComicButton.Classes.Add("hidden");
             }
         }
@@ -100,13 +97,21 @@ namespace FuzzyComic.ViewModels
         private async Task RunNextPage()
         {
             CurrentPageIndex++;
-            var entry = CurrentEntryList[CurrentPageIndex];
+            CurrentPage.CurrentImage = await LoadPage(CurrentPageIndex);
+        }
+
+        private async Task RunPreviousPage()
+        {
+            CurrentPageIndex--;
+            CurrentPage.CurrentImage = await LoadPage(CurrentPageIndex);
+        }
+
+        async Task<Bitmap> LoadPage(int index)
+        {
+            var entry = CurrentEntryList[index];
             using (var entryStream = entry.OpenEntryStream())
             {
-                if (!entry.IsDirectory)
-                {
-                    CurrentPage.CurrentImage = await DecodeEntryStream(entryStream);
-                }
+                return await DecodeEntryStream(entryStream);
             }
         }
 
@@ -115,7 +120,10 @@ namespace FuzzyComic.ViewModels
             var list = new List<IArchiveEntry>();
             foreach (var entry in entries)
             {
-                list.Add(entry);
+                if (!entry.IsDirectory)
+                {
+                    list.Add(entry);
+                }
             }
 
             list.Sort((a, b) => a.Key.CompareTo(b.Key));
