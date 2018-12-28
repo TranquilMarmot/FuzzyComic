@@ -13,7 +13,15 @@ namespace FuzzyComic.ViewModels
         public Bitmap CurrentImage
         {
             get { return bitmap; }
-            set { this.RaiseAndSetIfChanged(ref this.bitmap, value); }
+            set
+            {
+                if (this.bitmap != null)
+                {
+                    this.bitmap.Dispose();
+                }
+
+                this.RaiseAndSetIfChanged(ref this.bitmap, value);
+            }
         }
     }
 }
