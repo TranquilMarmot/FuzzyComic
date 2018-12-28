@@ -10,32 +10,47 @@
   </Design.DataContext>
 
   <Window.Styles>
-    <Style Selector="Button#openComicButton.hidden">
-      <Setter Property="IsVisible" 
-        Value="false"/>
+    <Style Selector="Button.invisible">
+      <Setter Property="Opacity" 
+        Value="0" />
+    </Style>
+
+    <Style Selector="Window">
+      <Setter Property="Background" 
+        Value="Black" />
     </Style>
   </Window.Styles>
 
   <Grid RowDefinitions="*" 
-    ColumnDefinitions="Auto,*,Auto">
-    <Button Grid.Row="0" 
-      Grid.Column="0" 
-      Command="{Binding DoPreviousPage}" 
-      Content="⬅" />
-    <Button Grid.Row="0" 
-      Grid.Column="1" 
-      Name="openComicButton" 
-      Content="Open Comic" 
-      Command="{Binding DoOpenComicFile}" />
-    <Image Grid.Row="0" 
-      Grid.Column="1" 
+    ColumnDefinitions="*">
+    <Image ZIndex="0" 
       Stretch="Uniform" 
-      Source="{Binding CurrentPage.CurrentImage}" 
-      Cursor="Hand" />
-    <Button Grid.Row="0" 
-      Grid.Column="2" 
-      Command="{Binding DoNextPage}" 
-      Content="➡" />
+      Source="{Binding CurrentPage.CurrentImage}" />
+
+    <Grid ZIndex="1" 
+      RowDefinitions="*" 
+      ColumnDefinitions="*,*,*">
+      <Button Grid.Row="0" 
+        Grid.Column="0" 
+        Name="previousPageButton" 
+        Command="{Binding DoPreviousPage}" 
+        Content="Previous Page" 
+        Cursor="Hand" />
+      <Button Grid.Row="0" 
+        Grid.Column="1" 
+        Name="openComicButton" 
+        Content="Double tap for menu" 
+        Height="100" 
+        Command="{Binding DoOpenComicFile}" 
+        Cursor="Hand" />
+      <Button Grid.Row="0" 
+        Grid.Column="2" 
+        Name="nextPageButton" 
+        Command="{Binding DoNextPage}" 
+        Content="Next Page" 
+        Cursor="Hand" />
+    </Grid>
+
   </Grid>
 
 </Window>
