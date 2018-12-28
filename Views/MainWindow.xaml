@@ -21,36 +21,35 @@
     </Style>
   </Window.Styles>
 
-  <Grid RowDefinitions="*" 
-    ColumnDefinitions="*">
+  <Panel>
     <Image ZIndex="0" 
       Stretch="Uniform" 
-      Source="{Binding CurrentPage.CurrentImage}" />
+      Source="{Binding CurrentComic.CurrentPage}" />
 
     <Grid ZIndex="1" 
-      RowDefinitions="*" 
+      RowDefinitions="*,*,*" 
       ColumnDefinitions="*,*,*">
       <Button Grid.Row="0" 
         Grid.Column="0" 
+        Grid.RowSpan="3" 
         Name="previousPageButton" 
         Command="{Binding DoPreviousPage}" 
         Content="Previous Page" 
         Cursor="Hand" />
-      <Button Grid.Row="0" 
+      <Button Grid.Row="1" 
         Grid.Column="1" 
         Name="openComicButton" 
         Content="Double tap for menu" 
-        Height="100" 
         Command="{Binding DoOpenComicFile}" 
         Cursor="Hand" />
       <Button Grid.Row="0" 
         Grid.Column="2" 
+        Grid.RowSpan="3" 
         Name="nextPageButton" 
         Command="{Binding DoNextPage}" 
         Content="Next Page" 
         Cursor="Hand" />
     </Grid>
-
-  </Grid>
+  </Panel>
 
 </Window>
