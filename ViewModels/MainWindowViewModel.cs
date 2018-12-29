@@ -83,13 +83,13 @@ namespace FuzzyComic.ViewModels
         }
 
         /// <summary> Go to the next page </summary>
-        private async Task RunNextPage()
+        public async Task RunNextPage()
         {
             await CurrentComic.GoToPage(CurrentComic.CurrentPageIndex + 1);
         }
 
         /// <summary> Go to the previous page </summary>
-        private async Task RunPreviousPage()
+        public async Task RunPreviousPage()
         {
             await CurrentComic.GoToPage(CurrentComic.CurrentPageIndex - 1);
         }

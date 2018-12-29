@@ -1,6 +1,7 @@
 using System;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using FuzzyComic.ViewModels;
 
@@ -14,7 +15,7 @@ namespace FuzzyComic.Views
             var openComicButton = this.FindControl<Button>("openComicButton");
             var previousPageButton = this.FindControl<Button>("previousPageButton");
             var nextPageButton = this.FindControl<Button>("nextPageButton");
-            DataContextChanged += (object sender, EventArgs wat) =>
+            this.DataContextChanged += (object sender, EventArgs wat) =>
             {
                 MainWindowViewModel viewModel = (MainWindowViewModel)this.DataContext;
 
@@ -22,6 +23,29 @@ namespace FuzzyComic.Views
                 viewModel.OpenComicButton = openComicButton;
                 viewModel.PreviousPageButton = previousPageButton;
                 viewModel.NextPageButton = nextPageButton;
+            };
+
+            this.KeyUp += async (object sender, KeyEventArgs args) =>
+            {
+                if (this.DataContext != null)
+                {
+                    MainWindowViewModel viewModel = (MainWindowViewModel)this.DataContext;
+
+                    switch (args.Key)
+                    {
+                        case Key.Right:
+                        case Key.Space:
+                            await viewModel.RunNextPage();
+                            break;
+                        case Key.Left:
+                        case Key.Back:
+                            await viewModel.RunPreviousPage();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
             };
         }
 
