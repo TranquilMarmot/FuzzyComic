@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Media.Imaging;
 using ReactiveUI;
 using SharpCompress.Archives;
@@ -30,7 +31,7 @@ namespace FuzzyComic.ViewModels
         /// <summary>Image of the current page being displayed</summary>
         public Bitmap CurrentPage
         {
-            get { return currentPageBitmap; }
+            get { return this.currentPageBitmap; }
             private set
             {
                 if (this.currentPageBitmap != null)
@@ -42,10 +43,30 @@ namespace FuzzyComic.ViewModels
             }
         }
 
+        private double progressBarWidth;
+
+        public double ProgressBarWidth
+        {
+            get { return this.progressBarWidth; }
+            private set
+            {
+                this.RaiseAndSetIfChanged(ref this.progressBarWidth, value);
+            }
+        }
+
         public async Task GoToPage(int page)
         {
             CurrentPageIndex = page;
             CurrentPage = await LoadPage(CurrentPageIndex);
+
+            UpdateProgressBarWidth();
+        }
+
+        public void UpdateProgressBarWidth()
+        {
+            var windowWidth = Application.Current.MainWindow.Width;
+            var percentDone = (double)CurrentPageIndex / (double)CurrentEntryList.Count;
+            ProgressBarWidth = windowWidth * percentDone;
         }
 
         /// <summary>

@@ -22,9 +22,26 @@
   </Window.Styles>
 
   <Panel>
-    <Image ZIndex="0" 
-      Stretch="Uniform" 
-      Source="{Binding CurrentComic.CurrentPage}" />
+    <Grid ZIndex="0" 
+      RowDefinitions="*,Auto" 
+      ColumnDefinitions="Auto,*">
+      <Image Grid.Row="0" 
+        Grid.Column="0" 
+        Grid.ColumnSpan="2" 
+        Stretch="Uniform" 
+        Source="{Binding CurrentComic.CurrentPage}" />
+
+      <Panel Grid.Row="1" 
+        Grid.Column="0" 
+        Width="{Binding CurrentComic.ProgressBarWidth}" 
+        Height="2" 
+        Background="Green" />
+      <Panel Grid.Row="1" 
+        Grid.Column="1" 
+        Height="2" 
+        Background="White" />
+
+    </Grid>
 
     <Grid ZIndex="1" 
       RowDefinitions="*,*,*" 
