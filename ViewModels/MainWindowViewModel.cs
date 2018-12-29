@@ -3,6 +3,7 @@
 using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using ReactiveUI;
 
@@ -13,12 +14,14 @@ namespace FuzzyComic.ViewModels
         public MainWindowViewModel()
         {
             DoExit = ReactiveCommand.Create(RunExit);
+            DoCloseMainMenu = ReactiveCommand.Create(RunCloseMainMenu);
             DoOpenComicFile = ReactiveCommand.CreateFromTask(RunOpenComicFile);
             DoNextPage = ReactiveCommand.CreateFromTask(RunNextPage);
             DoPreviousPage = ReactiveCommand.CreateFromTask(RunPreviousPage);
 
             CurrentComic = new ComicViewModel();
 
+            // TODO make sure this actually works...? OS should auto-close when the application is closed, but still...
             this.DetachedFromLogicalTree += (object sender, LogicalTreeAttachmentEventArgs args) => CurrentComic.CloseStreams();
         }
 
@@ -34,13 +37,40 @@ namespace FuzzyComic.ViewModels
         /// <summary> Go back a page </summary>
         public ReactiveCommand<Unit, Unit> DoPreviousPage { get; }
 
+        public ReactiveCommand<Unit, Unit> DoCloseMainMenu { get; }
+
+        /// <summary>
+        /// Handles opening, streaming, reading, etc.false image archives
+        /// Also keeps track of the current page
+        /// </summary>
         public ComicViewModel CurrentComic { get; set; }
+
+        private Button showMainMenuButton;
 
         /// <summary>
         /// Button to open the menu
         /// This gets set by the window when it gets the data context
         /// </summary>
-        public Button OpenComicButton { get; set; }
+        public Button ShowMainMenuButton
+        {
+            get { return this.showMainMenuButton; }
+            set
+            {
+                this.showMainMenuButton = value;
+
+                // since we want this to be a double tap,
+                // we're doing this here instead of binding it via XAML
+                this.showMainMenuButton.DoubleTapped += (object sender, RoutedEventArgs wat) =>
+                {
+                    this.RunOpenMainMenu();
+                };
+            }
+        }
+
+        /// <summary>
+        /// Container for the main menu items
+        /// </summary>
+        public Border MainMenuPanel { get; set; }
 
         /// <summary>
         /// Button to go to the previous page
@@ -54,11 +84,16 @@ namespace FuzzyComic.ViewModels
         /// </summary>
         public Button NextPageButton { get; set; }
 
+        /// <summary> Exits the application </summary>
         private void RunExit()
         {
+            // TODO show confirmation dialog
             System.Environment.Exit(0);
         }
 
+        /// <summary>
+        /// Opens a file browser to choose a comic, then handles opening the chosen file
+        /// </summary>
         private async Task RunOpenComicFile()
         {
             var dialog = new OpenFileDialog();
@@ -75,10 +110,14 @@ namespace FuzzyComic.ViewModels
                 var chosenPath = result[0];
                 await CurrentComic.LoadArchive(chosenPath);
 
-                // hide all of the buttons
-                OpenComicButton.Classes.Add("invisible");
+                // hide all of the buttons; we do this via opacity 0 via styles
+                // so that they can still be hit
+                ShowMainMenuButton.Classes.Add("invisible");
                 PreviousPageButton.Classes.Add("invisible");
                 NextPageButton.Classes.Add("invisible");
+
+                // also, make sure the main menu is closed
+                this.RunCloseMainMenu();
             }
         }
 
@@ -92,6 +131,18 @@ namespace FuzzyComic.ViewModels
         public async Task RunPreviousPage()
         {
             await CurrentComic.GoToPage(CurrentComic.CurrentPageIndex - 1);
+        }
+
+        /// <summary> Open the main manu </summary>
+        private void RunOpenMainMenu()
+        {
+            MainMenuPanel.IsVisible = true;
+        }
+
+        /// <summary> Close the main manu </summary>
+        private void RunCloseMainMenu()
+        {
+            MainMenuPanel.IsVisible = false;
         }
     }
 }

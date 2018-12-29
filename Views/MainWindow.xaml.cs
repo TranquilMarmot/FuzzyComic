@@ -12,17 +12,19 @@ namespace FuzzyComic.Views
         public MainWindow()
         {
             InitializeComponent();
-            var openComicButton = this.FindControl<Button>("openComicButton");
+            var showMainMenuButton = this.FindControl<Button>("showMainMenuButton");
             var previousPageButton = this.FindControl<Button>("previousPageButton");
             var nextPageButton = this.FindControl<Button>("nextPageButton");
+            var mainMenuPanel = this.FindControl<Border>("mainMenu");
             this.DataContextChanged += (object sender, EventArgs wat) =>
             {
                 MainWindowViewModel viewModel = (MainWindowViewModel)this.DataContext;
 
                 // tell the view model about our buttons so it can manipulate their classes
-                viewModel.OpenComicButton = openComicButton;
+                viewModel.ShowMainMenuButton = showMainMenuButton;
                 viewModel.PreviousPageButton = previousPageButton;
                 viewModel.NextPageButton = nextPageButton;
+                viewModel.MainMenuPanel = mainMenuPanel;
             };
 
             this.KeyUp += async (object sender, KeyEventArgs args) =>

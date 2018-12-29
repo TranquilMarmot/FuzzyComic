@@ -31,6 +31,7 @@
         Stretch="Uniform" 
         Source="{Binding CurrentComic.CurrentPage}" />
 
+      <!-- Progress bar at bottom of screen -->
       <Panel Grid.Row="1" 
         Grid.Column="0" 
         Width="{Binding CurrentComic.ProgressBarWidth}" 
@@ -40,9 +41,12 @@
         Grid.Column="1" 
         Height="2" 
         Background="White" />
-
     </Grid>
 
+    <!--
+      These buttons all have the "invisible" class added to them when
+      a comic is loaded, that way they are seen by default but hidden when reading
+    -->
     <Grid ZIndex="1" 
       RowDefinitions="*,*,*" 
       ColumnDefinitions="*,*,*">
@@ -55,9 +59,8 @@
         Cursor="Hand" />
       <Button Grid.Row="1" 
         Grid.Column="1" 
-        Name="openComicButton" 
+        Name="showMainMenuButton" 
         Content="Double tap for menu" 
-        Command="{Binding DoOpenComicFile}" 
         Cursor="Hand" />
       <Button Grid.Row="0" 
         Grid.Column="2" 
@@ -66,6 +69,37 @@
         Command="{Binding DoNextPage}" 
         Content="Next Page" 
         Cursor="Hand" />
+    </Grid>
+
+    <Grid RowDefinitions="*,Auto,*" 
+      ColumnDefinitions="*,Auto,*" 
+      ZIndex="3">
+      <Border Name="mainMenu" 
+        Grid.Row="1" 
+        Grid.Column="1" 
+        BorderBrush="Black" 
+        BorderThickness="1" 
+        CornerRadius="3" 
+        Padding="2" 
+        IsVisible="false">
+        <Border.Background>
+          <SolidColorBrush Opacity="0.3" 
+            Color="White" />
+        </Border.Background>
+        <StackPanel >
+          <Grid ColumnDefinitions="*,Auto">
+            <Button Content="X" 
+              Grid.Column="1" 
+              Command="{Binding DoCloseMainMenu}" />
+          </Grid>
+          <Button Content="Open Comic" 
+            Command="{Binding DoOpenComicFile}" 
+            Cursor="Hand" />
+          <Button Content="Quit Application" 
+            Command="{Binding DoExit}" 
+            Cursor="Hand" />
+        </StackPanel>
+      </Border>
     </Grid>
   </Panel>
 
