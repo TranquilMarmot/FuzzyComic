@@ -24,6 +24,7 @@
             <Button Grid.Column="2" 
                 Width="100" 
                 Height="25" 
+                Command="{Binding DoSave}" 
                 Content="Save" />
         </Grid>
     </Grid>

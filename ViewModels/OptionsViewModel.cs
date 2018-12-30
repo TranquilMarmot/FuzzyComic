@@ -12,12 +12,15 @@ namespace FuzzyComic.ViewModels
         public OptionsViewModel()
         {
             DoCancel = ReactiveCommand.Create(RunCancel);
+            DoSave = ReactiveCommand.Create(RunSave);
             ShowWindowDecorations = true;
         }
 
         public Action CloseOptionsWindow { get; set; }
 
         public ReactiveCommand<Unit, Unit> DoCancel { get; }
+
+        public ReactiveCommand<Unit, Unit> DoSave { get; }
 
         private bool showWindowDecorations = true;
 
@@ -45,6 +48,13 @@ namespace FuzzyComic.ViewModels
         private void RunCancel()
         {
             CloseOptionsWindow();
+        }
+
+        private void RunSave()
+        {
+            var settings = new Settings();
+            settings.isFullScreen = IsFullScreen;
+            UserSettings.Save(settings);
         }
     }
 }
