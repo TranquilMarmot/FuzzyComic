@@ -67,22 +67,12 @@ namespace FuzzyComic.ViewModels
             }
         }
 
+        public Grid NavigationButtonsContainer { get; set; }
+
         /// <summary>
         /// Container for the main menu items
         /// </summary>
         public Border MainMenuPanel { get; set; }
-
-        /// <summary>
-        /// Button to go to the previous page
-        /// This gets set by the window when it gets the data context
-        /// </summary>
-        public Button PreviousPageButton { get; set; }
-
-        /// <summary>
-        /// Button to go to the next page
-        /// This gets set by the window when it gets the data context
-        /// </summary>
-        public Button NextPageButton { get; set; }
 
         /// <summary> Exits the application </summary>
         private void RunExit()
@@ -112,9 +102,7 @@ namespace FuzzyComic.ViewModels
 
                 // hide all of the buttons; we do this via opacity 0 via styles
                 // so that they can still be hit
-                ShowMainMenuButton.Classes.Add("invisible");
-                PreviousPageButton.Classes.Add("invisible");
-                NextPageButton.Classes.Add("invisible");
+                NavigationButtonsContainer.Classes.Add("invisible");
 
                 // also, make sure the main menu is closed
                 this.RunCloseMainMenu();
