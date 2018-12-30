@@ -11,6 +11,7 @@ namespace FuzzyComic.Views
             this.DataContext = dataContext;
             this.InitializeComponent();
             this.Topmost = true;
+            dataContext.CloseOptionsWindow = this.Close;
         }
         private void InitializeComponent()
         {

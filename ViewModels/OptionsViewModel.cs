@@ -1,6 +1,7 @@
 
 
 using System;
+using System.Reactive;
 using Avalonia.Controls;
 using ReactiveUI;
 
@@ -8,6 +9,16 @@ namespace FuzzyComic.ViewModels
 {
     public class OptionsViewModel : ReactiveObject
     {
+        public OptionsViewModel()
+        {
+            DoCancel = ReactiveCommand.Create(RunCancel);
+            ShowWindowDecorations = true;
+        }
+
+        public Action CloseOptionsWindow { get; set; }
+
+        public ReactiveCommand<Unit, Unit> DoCancel { get; }
+
         private bool showWindowDecorations = true;
 
         public bool ShowWindowDecorations
@@ -29,6 +40,11 @@ namespace FuzzyComic.ViewModels
                 // Setting it directly on the window, however, works fine?
                 Avalonia.Application.Current.MainWindow.WindowState = this.isFullScreen ? WindowState.Maximized : WindowState.Normal;
             }
+        }
+
+        private void RunCancel()
+        {
+            CloseOptionsWindow();
         }
     }
 }

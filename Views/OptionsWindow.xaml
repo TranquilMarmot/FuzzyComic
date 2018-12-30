@@ -7,8 +7,24 @@
         <vm:OptionsViewModel/>
     </Design.DataContext>
 
-    <StackPanel Margin="15">
-        <CheckBox Content="Fullscreen" 
-            IsChecked="{Binding IsFullScreen}" />
-    </StackPanel>
+    <Grid RowDefinitions="*,Auto" 
+        Margin="15">
+        <StackPanel Grid.Row="0">
+            <CheckBox Content="Fullscreen" 
+                IsChecked="{Binding IsFullScreen}" />
+        </StackPanel>
+        <Grid Grid.Row="1" 
+            ColumnDefinitions="*,Auto,Auto">
+            <Button Grid.Column="1" 
+                Width="100" 
+                Height="25" 
+                Margin="0 0 10 0" 
+                Command="{Binding DoCancel}" 
+                Content="Cancel" />
+            <Button Grid.Column="2" 
+                Width="100" 
+                Height="25" 
+                Content="Save" />
+        </Grid>
+    </Grid>
 </Window>
