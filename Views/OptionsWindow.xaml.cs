@@ -6,10 +6,11 @@ namespace FuzzyComic.Views
 {
     public class OptionsWindow : Window
     {
-        public OptionsWindow(OptionsWindowViewModel dataContext)
+        public OptionsWindow(OptionsViewModel dataContext)
         {
             this.DataContext = dataContext;
             this.InitializeComponent();
+            this.Topmost = true;
         }
         private void InitializeComponent()
         {

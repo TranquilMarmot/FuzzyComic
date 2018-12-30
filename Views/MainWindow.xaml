@@ -3,8 +3,8 @@
   xmlns:vm="clr-namespace:FuzzyComic.ViewModels;assembly=FuzzyComic" 
   Icon="resm:FuzzyComic.Assets.avalonia-logo.ico" 
   Title="FuzzyComic" 
-  WindowState="Maximized" 
-  HasSystemDecorations="{Binding CurrentOptions.ShowSystemDecorations}">
+  WindowState="Normal" 
+  HasSystemDecorations="{Binding CurrentOptions.ShowWindowDecorations}">
   <Design.DataContext>
     <vm:MainWindowViewModel/>
   </Design.DataContext>

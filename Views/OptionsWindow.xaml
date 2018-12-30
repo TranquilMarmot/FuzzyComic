@@ -4,11 +4,11 @@
     Icon="resm:FuzzyComic.Assets.avalonia-logo.ico" 
     Title="FuzzyComic Options">
     <Design.DataContext>
-        <vm:OptionsWindowViewModel/>
+        <vm:OptionsViewModel/>
     </Design.DataContext>
 
     <StackPanel Margin="15">
-        <CheckBox Content="Show System Window Decorations" 
-            IsChecked="{Binding ShowSystemDecorations}" />
+        <CheckBox Content="Fullscreen" 
+            IsChecked="{Binding IsFullScreen}" />
     </StackPanel>
 </Window>
