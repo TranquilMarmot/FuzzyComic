@@ -119,6 +119,10 @@
             Classes="mainMenuButton" 
             Command="{Binding DoOpenComicFile}" 
             Cursor="Hand" />
+          <Button Content="Options" 
+            Classes="mainMenuButton" 
+            Command="{Binding DoShowOptionsMenu}" 
+            Cursor="Hand" />
           <Button Content="Quit Application" 
             Classes="mainMenuButton" 
             Command="{Binding DoExit}" 

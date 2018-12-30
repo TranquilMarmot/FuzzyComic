@@ -2,6 +2,7 @@ using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using FuzzyComic.ViewModels;
 
@@ -13,7 +14,6 @@ namespace FuzzyComic.Views
         {
             InitializeComponent();
             var navigationButtonsContainer = this.FindControl<Grid>("navigationButtonsContainer");
-            var showMainMenuButton = this.FindControl<Button>("showMainMenuButton");
             var mainMenuPanel = this.FindControl<Border>("mainMenu");
             this.DataContextChanged += (object sender, EventArgs wat) =>
             {
@@ -21,9 +21,18 @@ namespace FuzzyComic.Views
 
                 // tell the view model about our buttons so it can manipulate their classes
                 viewModel.NavigationButtonsContainer = navigationButtonsContainer;
-                viewModel.ShowMainMenuButton = showMainMenuButton;
                 viewModel.MainMenuPanel = mainMenuPanel;
             };
+
+            // we want this to open on double tap, so we add it here instead of binding in the XAML
+            var showMainMenuButton = this.FindControl<Button>("showMainMenuButton");
+            showMainMenuButton.DoubleTapped += (object sender, RoutedEventArgs wat) =>
+                {
+                    if (this.DataContext != null)
+                    {
+                        ((MainWindowViewModel)this.DataContext).RunOpenMainMenu();
+                    }
+                };
 
             this.KeyUp += async (object sender, KeyEventArgs args) =>
             {
@@ -48,7 +57,6 @@ namespace FuzzyComic.Views
                             break;
                     }
                 }
-
             };
         }
 

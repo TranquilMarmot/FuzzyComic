@@ -1,10 +1,9 @@
-﻿
-
-using System.Reactive;
+﻿using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
+using FuzzyComic.Views;
 using ReactiveUI;
 
 namespace FuzzyComic.ViewModels
@@ -15,11 +14,13 @@ namespace FuzzyComic.ViewModels
         {
             DoExit = ReactiveCommand.Create(RunExit);
             DoCloseMainMenu = ReactiveCommand.Create(RunCloseMainMenu);
+            DoShowOptionsMenu = ReactiveCommand.CreateFromTask(RunShowOptionsMenu);
             DoOpenComicFile = ReactiveCommand.CreateFromTask(RunOpenComicFile);
             DoNextPage = ReactiveCommand.CreateFromTask(RunNextPage);
             DoPreviousPage = ReactiveCommand.CreateFromTask(RunPreviousPage);
 
             CurrentComic = new ComicViewModel();
+            OptionsWindowInstance = new OptionsWindow(new OptionsWindowViewModel());
 
             // TODO make sure this actually works...? OS should auto-close when the application is closed, but still...
             this.DetachedFromLogicalTree += (object sender, LogicalTreeAttachmentEventArgs args) => CurrentComic.CloseStreams();
@@ -37,7 +38,11 @@ namespace FuzzyComic.ViewModels
         /// <summary> Go back a page </summary>
         public ReactiveCommand<Unit, Unit> DoPreviousPage { get; }
 
+        /// <summary> Close the main meunu </summary>
         public ReactiveCommand<Unit, Unit> DoCloseMainMenu { get; }
+
+        /// <summary> Open the options dialog </summary>
+        public ReactiveCommand<Unit, Unit> DoShowOptionsMenu { get; }
 
         /// <summary>
         /// Handles opening, streaming, reading, etc.false image archives
@@ -45,34 +50,19 @@ namespace FuzzyComic.ViewModels
         /// </summary>
         public ComicViewModel CurrentComic { get; set; }
 
-        private Button showMainMenuButton;
-
         /// <summary>
-        /// Button to open the menu
-        /// This gets set by the window when it gets the data context
+        /// Container with the navigation buttons in it
+        /// Opacity of this is set to 0 when a comic is opened
         /// </summary>
-        public Button ShowMainMenuButton
-        {
-            get { return this.showMainMenuButton; }
-            set
-            {
-                this.showMainMenuButton = value;
-
-                // since we want this to be a double tap,
-                // we're doing this here instead of binding it via XAML
-                this.showMainMenuButton.DoubleTapped += (object sender, RoutedEventArgs wat) =>
-                {
-                    this.RunOpenMainMenu();
-                };
-            }
-        }
-
         public Grid NavigationButtonsContainer { get; set; }
 
         /// <summary>
         /// Container for the main menu items
         /// </summary>
         public Border MainMenuPanel { get; set; }
+
+        /// <summary> Options menu </summary>
+        private OptionsWindow OptionsWindowInstance { get; }
 
         /// <summary> Exits the application </summary>
         private void RunExit()
@@ -127,7 +117,7 @@ namespace FuzzyComic.ViewModels
             MainMenuPanel.IsVisible = true;
         }
 
-        /// <summary> Close the main manu </summary>
+        /// <summary> Close the main menu </summary>
         public void RunCloseMainMenu()
         {
             MainMenuPanel.IsVisible = false;
@@ -140,6 +130,15 @@ namespace FuzzyComic.ViewModels
         public void RunToggleMainMenu()
         {
             MainMenuPanel.IsVisible = !MainMenuPanel.IsVisible;
+        }
+
+        /// <summary>
+        /// Show the options menu
+        /// Task finishes when the window is closed
+        /// </summary>
+        public async Task RunShowOptionsMenu()
+        {
+            await OptionsWindowInstance.ShowDialog();
         }
     }
 }
