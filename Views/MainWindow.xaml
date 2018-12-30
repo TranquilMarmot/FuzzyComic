@@ -16,6 +16,15 @@
         Value="0" />
     </Style>
 
+    <Style Selector="Button.mainMenuButton">
+      <Setter Property="Width" 
+        Value="300" />
+      <Setter Property="Height" 
+        Value="100" />
+      <Setter Property="Margin" 
+        Value="5" />
+    </Style>
+
     <Style Selector="Window">
       <Setter Property="Background" 
         Value="Black" />
@@ -88,25 +97,30 @@
       <Border Name="mainMenu" 
         Grid.Row="1" 
         Grid.Column="1" 
-        BorderBrush="Black" 
+        BorderBrush="Gray" 
         BorderThickness="1" 
         CornerRadius="5" 
         Padding="5" 
         IsVisible="false">
         <Border.Background>
-          <SolidColorBrush Opacity="0.4" 
+          <SolidColorBrush Opacity="0.8" 
             Color="White" />
         </Border.Background>
-        <StackPanel >
+        <StackPanel>
+          <!-- Button to close the main menu, grid is used to place it on the top-right -->
           <Grid ColumnDefinitions="*,Auto">
             <Button Content="X" 
               Grid.Column="1" 
+              Width="35" 
+              Height="35" 
               Command="{Binding DoCloseMainMenu}" />
           </Grid>
           <Button Content="Open Comic" 
+            Classes="mainMenuButton" 
             Command="{Binding DoOpenComicFile}" 
             Cursor="Hand" />
           <Button Content="Quit Application" 
+            Classes="mainMenuButton" 
             Command="{Binding DoExit}" 
             Cursor="Hand" />
         </StackPanel>
