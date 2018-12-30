@@ -134,15 +134,24 @@ namespace FuzzyComic.ViewModels
         }
 
         /// <summary> Open the main manu </summary>
-        private void RunOpenMainMenu()
+        public void RunOpenMainMenu()
         {
             MainMenuPanel.IsVisible = true;
         }
 
         /// <summary> Close the main manu </summary>
-        private void RunCloseMainMenu()
+        public void RunCloseMainMenu()
         {
             MainMenuPanel.IsVisible = false;
+        }
+
+        /// <summary>
+        /// If the main menu is visible, hides it
+        /// If it is hidden, shows it.
+        /// </summary>
+        public void RunToggleMainMenu()
+        {
+            MainMenuPanel.IsVisible = !MainMenuPanel.IsVisible;
         }
     }
 }

@@ -43,6 +43,9 @@ namespace FuzzyComic.Views
                         case Key.Back:
                             await viewModel.RunPreviousPage();
                             break;
+                        case Key.Escape:
+                            viewModel.RunToggleMainMenu();
+                            break;
                         default:
                             break;
                     }
