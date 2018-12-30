@@ -20,7 +20,7 @@ namespace FuzzyComic.ViewModels
             DoPreviousPage = ReactiveCommand.CreateFromTask(RunPreviousPage);
 
             CurrentComic = new ComicViewModel();
-            OptionsWindowInstance = new OptionsWindow(new OptionsWindowViewModel());
+            CurrentOptions = new OptionsWindowViewModel();
 
             // TODO make sure this actually works...? OS should auto-close when the application is closed, but still...
             this.DetachedFromLogicalTree += (object sender, LogicalTreeAttachmentEventArgs args) => CurrentComic.CloseStreams();
@@ -61,8 +61,7 @@ namespace FuzzyComic.ViewModels
         /// </summary>
         public Border MainMenuPanel { get; set; }
 
-        /// <summary> Options menu </summary>
-        private OptionsWindow OptionsWindowInstance { get; }
+        public OptionsWindowViewModel CurrentOptions { get; set; }
 
         /// <summary> Exits the application </summary>
         private void RunExit()
@@ -138,7 +137,8 @@ namespace FuzzyComic.ViewModels
         /// </summary>
         public async Task RunShowOptionsMenu()
         {
-            await OptionsWindowInstance.ShowDialog();
+            var optionsWindow = new OptionsWindow(CurrentOptions);
+            await optionsWindow.ShowDialog();
         }
     }
 }

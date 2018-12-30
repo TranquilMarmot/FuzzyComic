@@ -8,7 +8,7 @@
     </Design.DataContext>
 
     <StackPanel Margin="15">
-        <TextBlock Text="Hello World in dialog!" 
-            Margin="5" />
+        <CheckBox Content="Show System Window Decorations" 
+            IsChecked="{Binding ShowSystemDecorations}" />
     </StackPanel>
 </Window>

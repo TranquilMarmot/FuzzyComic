@@ -4,7 +4,7 @@
   Icon="resm:FuzzyComic.Assets.avalonia-logo.ico" 
   Title="FuzzyComic" 
   WindowState="Maximized" 
-  HasSystemDecorations="false">
+  HasSystemDecorations="{Binding CurrentOptions.ShowSystemDecorations}">
   <Design.DataContext>
     <vm:MainWindowViewModel/>
   </Design.DataContext>
