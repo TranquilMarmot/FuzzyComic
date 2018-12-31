@@ -118,7 +118,9 @@ namespace FuzzyComic.ViewModels
         private void RunSave()
         {
             // copy the changed settings to a Settings object and save it
-            UserSettings.SaveToFile(this.CopyToSettings());
+            var settings = this.CopyToSettings();
+            UserSettings.SaveToFile(settings);
+            UserSettings.CurrentSettings = settings;
             CloseOptionsWindow();
         }
     }
