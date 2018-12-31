@@ -10,6 +10,8 @@ namespace FuzzyComic
     {
         static void Main(string[] args)
         {
+            UserSettings.CurrentSettings = UserSettings.LoadFromFile();
+
             BuildAvaloniaApp().Start<MainWindow>(() => new MainWindowViewModel());
         }
 
