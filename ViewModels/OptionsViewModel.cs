@@ -109,13 +109,15 @@ namespace FuzzyComic.ViewModels
         /// <summary> Cancel options changes </summary>
         private void RunCancel()
         {
-            // TODO restore previous settings
+            // re-apply the un-saved settings we had before opening the window
+            this.ApplySettings(UserSettings.CurrentSettings);
             CloseOptionsWindow();
         }
 
         /// <summary> Save options changes </summary>
         private void RunSave()
         {
+            // copy the changed settings to a Settings object and save it
             UserSettings.SaveToFile(this.CopyToSettings());
             CloseOptionsWindow();
         }
