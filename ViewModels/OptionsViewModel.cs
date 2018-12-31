@@ -1,8 +1,10 @@
-
-
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive;
 using Avalonia.Controls;
+using Avalonia.Media;
+using FuzzyComic.Views;
 using ReactiveUI;
 
 namespace FuzzyComic.ViewModels
@@ -60,13 +62,38 @@ namespace FuzzyComic.ViewModels
             }
         }
 
+        private int selectedBackgroundColorIndex;
+
+        /// <summary>
+        /// Index in the Dropdown of the selected color.
+        /// This is only really used to read the selected color from the Settings.
+        /// </summary>
+        public int SelectedBackgroundColorIndex
+        {
+            get { return this.selectedBackgroundColorIndex; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedBackgroundColorIndex, value); }
+        }
+
+        public Color selectedBackgroundColor;
+
+        /// <summary>
+        /// Selected background color for the main window
+        /// </summary>
+        public Color SelectedBackgroundColor
+        {
+            get { return this.selectedBackgroundColor; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedBackgroundColor, value); }
+        }
+
         /// <summary>
         /// Given a Settings object, will apply all of its settings to this view model
         /// </summary>
         /// <param name="settings">Settings to apply</param>
         public void ApplySettings(Settings settings)
         {
-            this.IsFullScreen = settings.isFullScreen;
+            this.IsFullScreen = settings.isFullScreen.Value;
+            this.SelectedBackgroundColorIndex = OptionsWindow.BackgroundColors.Keys.ToList().IndexOf(settings.backgroundColor);
+            this.SelectedBackgroundColor = OptionsWindow.BackgroundColors.Values.ToList()[this.SelectedBackgroundColorIndex];
         }
 
         /// <summary> Copy this view model out to a Settings object </summary>
@@ -75,6 +102,7 @@ namespace FuzzyComic.ViewModels
         {
             var settings = new Settings();
             settings.isFullScreen = this.IsFullScreen;
+            settings.backgroundColor = OptionsWindow.BackgroundColors.Keys.ToList()[this.SelectedBackgroundColorIndex];
             return settings;
         }
 

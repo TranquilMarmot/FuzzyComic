@@ -9,7 +9,9 @@ namespace FuzzyComic
     /// </summary>
     public struct Settings
     {
-        public bool isFullScreen;
+        public bool? isFullScreen;
+
+        public String backgroundColor;
 
         /// <summary>
         /// Returns the default settings, for use if no settings file exists
@@ -21,7 +23,35 @@ namespace FuzzyComic
 
             defaults.isFullScreen = false;
 
+            // See OptionsWindow class for definitions of the colors
+            defaults.backgroundColor = "backgroundColorBlack";
+
             return defaults;
+        }
+
+        /// <summary>
+        /// Merge the given settings with the defaults; if any keys in the given settings don't have values,
+        /// they will be set to the defaults.
+        ///
+        /// This is mainly for when new settings are added and aren't in the serialized settings XML.
+        /// </summary>
+        /// <param name="settings">Settings to merge with defaults</param>
+        /// <returns>Settings with default values for key the given settings didn't have</returns>
+        public static Settings MergeWithDefaults(Settings settings)
+        {
+            var merged = Default();
+
+            if (settings.isFullScreen.HasValue)
+            {
+                merged.isFullScreen = settings.isFullScreen;
+            }
+
+            if (settings.backgroundColor != null)
+            {
+                merged.backgroundColor = settings.backgroundColor;
+            }
+
+            return merged;
         }
     }
 
@@ -61,7 +91,7 @@ namespace FuzzyComic
             using (var file = File.OpenRead(SettingsFilePath))
             {
                 System.Console.WriteLine("Loading settings from file...");
-                return (Settings)reader.Deserialize(file);
+                return Settings.MergeWithDefaults((Settings)reader.Deserialize(file));
             }
         }
 

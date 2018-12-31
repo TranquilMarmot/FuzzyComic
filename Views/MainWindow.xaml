@@ -9,6 +9,10 @@
     <vm:MainWindowViewModel/>
   </Design.DataContext>
 
+  <Window.Background>
+    <SolidColorBrush Color="{Binding CurrentOptions.SelectedBackgroundColor}" />
+  </Window.Background>
+
   <Window.Styles>
     <!-- Used to hide the main navigation buttons when a comic is opened -->
     <Style Selector="Grid.invisible">
@@ -23,11 +27,6 @@
         Value="100" />
       <Setter Property="Margin" 
         Value="5" />
-    </Style>
-
-    <Style Selector="Window">
-      <Setter Property="Background" 
-        Value="Black" />
     </Style>
   </Window.Styles>
 
