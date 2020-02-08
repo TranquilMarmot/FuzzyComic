@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media.Imaging;
 using ReactiveUI;
 using SharpCompress.Archives;
@@ -64,9 +65,12 @@ namespace FuzzyComic.ViewModels
 
         public void UpdateProgressBarWidth()
         {
-            var windowWidth = Application.Current.MainWindow.Width;
-            var percentDone = (double)CurrentPageIndex / (double)CurrentEntryList.Count;
-            ProgressBarWidth = windowWidth * percentDone;
+            if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                var windowWidth = desktop.MainWindow.Width;
+                var percentDone = (double)CurrentPageIndex / (double)CurrentEntryList.Count;
+                ProgressBarWidth = windowWidth * percentDone;
+            }
         }
 
         /// <summary>

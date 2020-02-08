@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui" 
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
   xmlns:vm="clr-namespace:FuzzyComic.ViewModels;assembly=FuzzyComic" 
+  x:App="FuzzyComic.Views.MainWindow" 
   Icon="resm:FuzzyComic.Assets.avalonia-logo.ico" 
   Title="FuzzyComic" 
   WindowState="Normal" 
