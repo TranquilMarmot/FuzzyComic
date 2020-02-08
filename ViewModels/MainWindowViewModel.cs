@@ -1,8 +1,8 @@
-﻿using System;
-using System.Reactive;
+﻿using System.Reactive;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.LogicalTree;
 using FuzzyComic.Views;
 using ReactiveUI;
@@ -76,26 +76,29 @@ namespace FuzzyComic.ViewModels
         /// </summary>
         private async Task RunOpenComicFile()
         {
-            var dialog = new OpenFileDialog();
-            dialog.Title = "Pick a comic";
-            dialog.AllowMultiple = false;
-            dialog.Filters.Add(new FileDialogFilter() { Name = "Comic Book Archive", Extensions = { "cbz", "cbr" } });
-            dialog.Filters.Add(new FileDialogFilter() { Name = "Image Archive", Extensions = { "zip", "rar" } });
-            dialog.Filters.Add(new FileDialogFilter() { Name = "All", Extensions = { "*" } });
-
-            var result = await dialog.ShowAsync();
-            if (result != null)
+            if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                // open the chosen file
-                var chosenPath = result[0];
-                await CurrentComic.LoadArchive(chosenPath);
+                var dialog = new OpenFileDialog();
+                dialog.Title = "Pick a comic";
+                dialog.AllowMultiple = false;
+                dialog.Filters.Add(new FileDialogFilter() { Name = "Comic Book Archive", Extensions = { "cbz", "cbr" } });
+                dialog.Filters.Add(new FileDialogFilter() { Name = "Image Archive", Extensions = { "zip", "rar" } });
+                dialog.Filters.Add(new FileDialogFilter() { Name = "All", Extensions = { "*" } });
 
-                // hide all of the buttons; we do this via opacity 0 via styles
-                // so that they can still be hit
-                NavigationButtonsContainer.Classes.Add("invisible");
+                var result = await dialog.ShowAsync(desktop.MainWindow);
+                if (result != null)
+                {
+                    // open the chosen file
+                    var chosenPath = result[0];
+                    await CurrentComic.LoadArchive(chosenPath);
 
-                // also, make sure the main menu is closed
-                this.RunCloseMainMenu();
+                    // hide all of the buttons; we do this via opacity 0 via styles
+                    // so that they can still be hit
+                    NavigationButtonsContainer.Classes.Add("invisible");
+
+                    // also, make sure the main menu is closed
+                    this.RunCloseMainMenu();
+                }
             }
         }
 
@@ -138,8 +141,12 @@ namespace FuzzyComic.ViewModels
         /// </summary>
         public async Task RunShowOptionsMenu()
         {
-            var optionsWindow = new OptionsWindow(CurrentOptions);
-            await optionsWindow.ShowDialog();
+            if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                var optionsWindow = new OptionsWindow(CurrentOptions);
+                await optionsWindow.ShowDialog(desktop.MainWindow);
+            }
+
         }
     }
 }

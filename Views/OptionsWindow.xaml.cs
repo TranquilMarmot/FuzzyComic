@@ -9,10 +9,12 @@ namespace FuzzyComic.Views
 {
     public class OptionsWindow : Window
     {
+        public OptionsWindow() { }
+
         /// <summary>
         /// List of background color options.
-        /// These MUST match the DropdownItems in the XAML.
-        /// The key is the "Name" of the DropdownItem, the value is the corresponding color value
+        /// These MUST match the ComboBoxItems in the XAML.
+        /// The key is the "Name" of the ComboBoxItem, the value is the corresponding color value
         /// </summary>
         public static Dictionary<string, Color> BackgroundColors = new Dictionary<string, Color> {
             { "backgroundColorBlack", Colors.Black },
@@ -30,13 +32,13 @@ namespace FuzzyComic.Views
             // this.Topmost = true;
             dataContext.CloseOptionsWindow = this.Close;
 
-            // attach the handler for the background color dropdown
-            var backgroundColorDropdown = this.FindControl<DropDown>("backgroundColorDropdown");
-            backgroundColorDropdown.SelectionChanged += OnBackgroundColorDropdowmSelectionChanges;
+            // attach the handler for the background color combobox
+            var backgroundColorComboBox = this.FindControl<ComboBox>("backgroundColorComboBox");
+            backgroundColorComboBox.SelectionChanged += OnBackgroundColorDropdowmSelectionChanges;
         }
 
         /// <summary>
-        /// Handles changes to  the background color dropdown and sets the appropriate values in the view model
+        /// Handles changes to  the background color combobox and sets the appropriate values in the view model
         /// </summary>
         private void OnBackgroundColorDropdowmSelectionChanges(object sender, SelectionChangedEventArgs args)
         {
@@ -45,7 +47,7 @@ namespace FuzzyComic.Views
             // since you can only have one selected at a time, we only care about added items
             if (args.AddedItems.Count == 1)
             {
-                var item = (DropDownItem)args.AddedItems[0];
+                var item = (ComboBoxItem)args.AddedItems[0];
 
                 // grab the corresponding color
                 var color = BackgroundColors[item.Name];

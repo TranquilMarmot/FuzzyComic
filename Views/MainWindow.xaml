@@ -1,7 +1,8 @@
 <Window xmlns="https://github.com/avaloniaui" 
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
   xmlns:vm="clr-namespace:FuzzyComic.ViewModels;assembly=FuzzyComic" 
-  Icon="resm:FuzzyComic.Assets.avalonia-logo.ico" 
+  x:Class="FuzzyComic.Views.MainWindow" 
+  Icon="resm:FuzzyComic.Assets.icon.ico" 
   Title="FuzzyComic" 
   WindowState="Normal" 
   HasSystemDecorations="{Binding CurrentOptions.ShowWindowDecorations}">
@@ -123,7 +124,7 @@
             Classes="mainMenuButton" 
             Command="{Binding DoShowOptionsMenu}" 
             Cursor="Hand" />
-          <Button Content="Quit Application" 
+          <Button Content="Quit" 
             Classes="mainMenuButton" 
             Command="{Binding DoExit}" 
             Cursor="Hand" />

@@ -1,7 +1,8 @@
 <Window xmlns="https://github.com/avaloniaui" 
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
     xmlns:vm="clr-namespace:FuzzyComic.ViewModels;assembly=FuzzyComic" 
-    Icon="resm:FuzzyComic.Assets.avalonia-logo.ico" 
+    x:Class="FuzzyComic.Views.OptionsWindow" 
+    Icon="resm:FuzzyComic.Assets.icon.ico" 
     Title="FuzzyComic Options">
     <Design.DataContext>
         <vm:OptionsViewModel/>
@@ -24,29 +25,29 @@
             <!--
                 NOTE:
                 The order in this list MUST match the BackgroundColors dictionary in the corresponding class
-                The "Name" of each DropdownItem is used to look up the colors
+                The "Name" of each ComboBoxItem is used to look up the colors
             -->
-            <DropDown SelectedIndex="{Binding SelectedBackgroundColorIndex}" 
+            <ComboBox SelectedIndex="{Binding SelectedBackgroundColorIndex}" 
                 Height="40" 
                 Width="40" 
-                Name="backgroundColorDropdown">
-                <DropDownItem Name="backgroundColorBlack">
+                Name="backgroundColorComboBox">
+                <ComboBoxItem Name="backgroundColorBlack">
                     <StackPanel Orientation="Horizontal">
                         <Rectangle Fill="Black" 
                             Height="20" 
                             Width="15" />
                         <TextBlock Text="Black" />
                     </StackPanel>
-                </DropDownItem>
-                <DropDownItem Name="backgroundColorWhite">
+                </ComboBoxItem>
+                <ComboBoxItem Name="backgroundColorWhite">
                     <StackPanel Orientation="Horizontal">
                         <Rectangle Fill="White" 
                             Height="20" 
                             Width="15" />
                         <TextBlock Text="White" />
                     </StackPanel>
-                </DropDownItem>
-            </DropDown>
+                </ComboBoxItem>
+            </ComboBox>
         </StackPanel>
         <Grid Grid.Row="1" 
             ColumnDefinitions="*,Auto,Auto">

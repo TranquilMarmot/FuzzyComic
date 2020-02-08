@@ -1,18 +1,17 @@
-﻿using System;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Logging.Serilog;
-using FuzzyComic.ViewModels;
-using FuzzyComic.Views;
+using Avalonia.ReactiveUI;
 
 namespace FuzzyComic
 {
     class Program
     {
-        static void Main(string[] args)
+        // The entry point. Things aren't ready yet, so at this point
+        // you shouldn't use any Avalonia types or anything that expects
+        // a SynchronizationContext to be ready
+        public static void Main(string[] args)
         {
-            UserSettings.CurrentSettings = UserSettings.LoadFromFile();
-
-            BuildAvaloniaApp().Start<MainWindow>(() => new MainWindowViewModel());
+            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
         }
 
         public static AppBuilder BuildAvaloniaApp()
