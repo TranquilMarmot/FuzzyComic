@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using FuzzyComic.ViewModels;
 using FuzzyComic.Views;
 
 namespace FuzzyComic
@@ -12,6 +13,7 @@ namespace FuzzyComic
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 desktop.MainWindow = new MainWindow();
+                desktop.MainWindow.DataContext = new MainWindowViewModel();
             }
 
             base.OnFrameworkInitializationCompleted();
