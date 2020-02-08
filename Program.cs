@@ -1,7 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Logging.Serilog;
 using Avalonia.ReactiveUI;
-using FuzzyComic.Views;
 
 namespace FuzzyComic
 {
@@ -12,8 +11,6 @@ namespace FuzzyComic
         // a SynchronizationContext to be ready
         public static void Main(string[] args)
         {
-            UserSettings.CurrentSettings = UserSettings.LoadFromFile();
-
             BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
         }
 

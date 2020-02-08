@@ -12,6 +12,7 @@ namespace FuzzyComic
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
+                UserSettings.CurrentSettings = UserSettings.LoadFromFile();
                 desktop.MainWindow = new MainWindow();
                 desktop.MainWindow.DataContext = new MainWindowViewModel();
             }
