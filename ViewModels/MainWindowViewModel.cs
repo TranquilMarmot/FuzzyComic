@@ -1,10 +1,8 @@
-﻿using System;
-using System.Reactive;
+﻿using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using FuzzyComic.Views;
 using ReactiveUI;

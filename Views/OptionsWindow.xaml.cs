@@ -9,6 +9,8 @@ namespace FuzzyComic.Views
 {
     public class OptionsWindow : Window
     {
+        public OptionsWindow() { }
+
         /// <summary>
         /// List of background color options.
         /// These MUST match the DropdownItems in the XAML.
