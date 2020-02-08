@@ -64,7 +64,7 @@ namespace FuzzyComic.ViewModels
         private int selectedBackgroundColorIndex;
 
         /// <summary>
-        /// Index in the Dropdown of the selected color.
+        /// Index in the ComboBox of the selected color.
         /// This is only really used to read the selected color from the Settings.
         /// </summary>
         public int SelectedBackgroundColorIndex
