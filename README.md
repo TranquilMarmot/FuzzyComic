@@ -33,4 +33,12 @@ dotnet run
 
 The UI is cross-platform and is built using [Avalonia UI](http://avaloniaui.net/).
 
+---
+
 Archive decompression is done using [SharpCompress](https://github.com/adamhathcock/sharpcompress) which is capable of reading both zip and rar archives. Files are read in a streaming fashion; images are not opened until their page is opened.
+
+---
+
+PDF loading is done via ImageMagick using [Magick.NET](https://github.com/dlemstra/Magick.NET).
+
+**NOTE:** Currently, loading PDFs also requires that you install the latest version of [Ghostscript](https://www.ghostscript.com/download/gsdnld.html).

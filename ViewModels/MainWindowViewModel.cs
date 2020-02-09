@@ -9,7 +9,7 @@ using ReactiveUI;
 
 namespace FuzzyComic.ViewModels
 {
-    public class MainWindowViewModel : Control
+    public class MainWindowViewModel : ReactiveObject
     {
         public MainWindowViewModel()
         {
@@ -20,11 +20,11 @@ namespace FuzzyComic.ViewModels
             DoNextPage = ReactiveCommand.CreateFromTask(RunNextPage);
             DoPreviousPage = ReactiveCommand.CreateFromTask(RunPreviousPage);
 
-            CurrentComic = new ComicViewModel();
+            // CurrentComic = new ComicViewModel();
             CurrentOptions = new OptionsViewModel();
 
             // TODO make sure this actually works...? OS should auto-close when the application is closed, but still...
-            this.DetachedFromLogicalTree += (object sender, LogicalTreeAttachmentEventArgs args) => CurrentComic.CloseStreams();
+            // this.DetachedFromLogicalTree += (object sender, LogicalTreeAttachmentEventArgs args) => CurrentComic.CloseStreams();
         }
 
         /// <summary> Opens a file dialog to pick a comic </summary>
@@ -45,11 +45,20 @@ namespace FuzzyComic.ViewModels
         /// <summary> Open the options dialog </summary>
         public ReactiveCommand<Unit, Unit> DoShowOptionsMenu { get; }
 
+        private BaseComicViewModel currentComic;
+
         /// <summary>
         /// Handles opening, streaming, reading, etc.false image archives
         /// Also keeps track of the current page
         /// </summary>
-        public ComicViewModel CurrentComic { get; set; }
+        public BaseComicViewModel CurrentComic
+        {
+            get { return this.currentComic; }
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.currentComic, value);
+            }
+        }
 
         /// <summary>
         /// Container with the navigation buttons in it
@@ -81,8 +90,10 @@ namespace FuzzyComic.ViewModels
                 var dialog = new OpenFileDialog();
                 dialog.Title = "Pick a comic";
                 dialog.AllowMultiple = false;
+                dialog.Filters.Add(new FileDialogFilter() { Name = "Supported Formats", Extensions = { "cbz", "cbr", "zip", "rar", "pdf" } });
                 dialog.Filters.Add(new FileDialogFilter() { Name = "Comic Book Archive", Extensions = { "cbz", "cbr" } });
                 dialog.Filters.Add(new FileDialogFilter() { Name = "Image Archive", Extensions = { "zip", "rar" } });
+                dialog.Filters.Add(new FileDialogFilter() { Name = "PDF", Extensions = { "pdf" } });
                 dialog.Filters.Add(new FileDialogFilter() { Name = "All", Extensions = { "*" } });
 
                 var result = await dialog.ShowAsync(desktop.MainWindow);
@@ -90,7 +101,19 @@ namespace FuzzyComic.ViewModels
                 {
                     // open the chosen file
                     var chosenPath = result[0];
-                    await CurrentComic.LoadArchive(chosenPath);
+
+                    if (chosenPath.EndsWith(".cbz") || chosenPath.EndsWith(".cbr") || chosenPath.EndsWith(".zip") || chosenPath.EndsWith(".rar"))
+                    {
+                        var archiveViewModel = new ArchiveComicViewModel();
+                        await archiveViewModel.LoadArchive(chosenPath);
+                        CurrentComic = archiveViewModel;
+                    }
+                    else if (chosenPath.EndsWith(".pdf"))
+                    {
+                        var pdfViewModel = new PDFComicViewModel();
+                        await pdfViewModel.LoadPDF(chosenPath);
+                        CurrentComic = pdfViewModel;
+                    }
 
                     // hide all of the buttons; we do this via opacity 0 via styles
                     // so that they can still be hit
