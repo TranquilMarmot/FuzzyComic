@@ -13,6 +13,13 @@ namespace FuzzyComic.ViewModels
     /// </summary>
     public class PDFComicViewModel : BaseComicViewModel
     {
+        /// <summary>
+        /// Folder that contains GhostScript exe/dll.
+        /// 
+        /// These are copied to the `bin` directory via a `Content Include` tag in the root `.csproj` file.
+        /// </summary>
+        private static string GhostScriptDirectory = $"{System.AppContext.BaseDirectory}\\Ghostscript";
+
         /// <summary> Full path of PDF file </summary>
         private string FilePath;
 
@@ -25,11 +32,15 @@ namespace FuzzyComic.ViewModels
         /// <param name="filePath">Path of PDF to load</param>
         public async Task LoadPDF(string filePath)
         {
+            // TODO Figure out how this works on Linux/macOS
+            MagickNET.SetGhostscriptDirectory(GhostScriptDirectory);
+
             FilePath = filePath;
 
+            // Load the number of pages
             NumberOfPages = GetNumberOfPages(filePath);
 
-            // load the first page
+            // Load the first page
             await base.GoToPage(0);
         }
 
@@ -40,7 +51,41 @@ namespace FuzzyComic.ViewModels
         /// <returns>Number of pages in the PDF</returns>
         private int GetNumberOfPages(string filePath)
         {
-            System.Console.WriteLine(System.AppContext.BaseDirectory);
+            // Run the GhostScript executable
+            // TODO: Figure out how to run this on Linux/macOS
+            var process = new System.Diagnostics.Process();
+            process.StartInfo.FileName = $"{GhostScriptDirectory}\\gswin64c.exe";
+
+            // This GhostScript command will (quickly) output the number of pages in the PDF
+            process.StartInfo.Arguments = $"-q -dNODISPLAY -dNOSAFER -c \"({filePath.Replace("\\", "/")}) (r) file runpdfbegin pdfpagecount = quit\"";
+
+            // Set these so a new window doesn't pop up
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+
+            // Set output of program to be written to process output stream
+            process.StartInfo.RedirectStandardOutput = true;
+
+            // Start the process
+            process.Start();
+
+            // Get program output
+            string strOutput = process.StandardOutput.ReadToEnd();
+
+            // Wait for process to finish
+            process.WaitForExit();
+
+            int output;
+            if (int.TryParse(strOutput, out output))
+            {
+                return output;
+            }
+            else
+            {
+                System.Console.Error.WriteLine($"Error getting number of pages in PDF. Got output:\n{strOutput}");
+            }
+
+            // Note: By default we do 1 instead of 0 to avoid divide by zero errors
             return 1;
         }
 
@@ -62,7 +107,7 @@ namespace FuzzyComic.ViewModels
                 {
                     return await Task.Run(() =>
                     {
-                        MagickReadSettings settings = new MagickReadSettings();
+                        var settings = new MagickReadSettings();
 
                         // Page to read
                         settings.FrameIndex = pageNumber;

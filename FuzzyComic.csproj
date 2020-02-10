@@ -19,4 +19,10 @@
     <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="7.15.1" />
     <PackageReference Include="SharpCompress" Version="0.24.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="GhostScript\*.*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>  
+  </ItemGroup>
 </Project>
