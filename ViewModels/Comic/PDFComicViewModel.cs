@@ -1,12 +1,9 @@
 using System.IO;
 using System.Threading.Tasks;
-using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media.Imaging;
 using ImageMagick;
-using SkiaSharp;
 
-namespace FuzzyComic.ViewModels
+namespace FuzzyComic.ViewModels.Comic
 {
     /// <summary>
     /// ViewModel for loading a PDF image-by-image
@@ -23,25 +20,28 @@ namespace FuzzyComic.ViewModels
         /// <summary> Full path of PDF file </summary>
         private string FilePath;
 
-        /// <summary> Total number of pages in the PDF </summary>
-        private int NumberOfPages;
+        private PDFComicViewModel(string filePath)
+        {
+            FilePath = filePath;
+            TotalPages = GetNumberOfPages();
+        }
 
         /// <summary>
-        /// Load the PDF from the given path, and load the first page
+        /// Load a PDF file
         /// </summary>
-        /// <param name="filePath">Path of PDF to load</param>
-        public async Task LoadPDF(string filePath)
+        /// <param name="filePath">Path of file to load</param>
+        /// <returns>ViewModel that shows a PDF comic</returns>
+        public static async Task<PDFComicViewModel> LoadPDF(string filePath)
         {
-            // TODO Figure out how this works on Linux/macOS
+            // TODO Figure out how this works on Linux/macOS?
             MagickNET.SetGhostscriptDirectory(GhostScriptDirectory);
 
-            FilePath = filePath;
-
-            // Load the number of pages
-            NumberOfPages = GetNumberOfPages(filePath);
+            var viewModel = new PDFComicViewModel(filePath);
 
             // Load the first page
-            await base.GoToPage(0);
+            await viewModel.GoToPage(0);
+
+            return viewModel;
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace FuzzyComic.ViewModels
         /// </summary>
         /// <param name="filePath">Path of PDF to get number of pages from</param>
         /// <returns>Number of pages in the PDF</returns>
-        private int GetNumberOfPages(string filePath)
+        private int GetNumberOfPages()
         {
             // Run the GhostScript executable
             // TODO: Figure out how to run this on Linux/macOS
@@ -57,7 +57,7 @@ namespace FuzzyComic.ViewModels
             process.StartInfo.FileName = $"{GhostScriptDirectory}\\gswin64c.exe";
 
             // This GhostScript command will (quickly) output the number of pages in the PDF
-            process.StartInfo.Arguments = $"-q -dNODISPLAY -dNOSAFER -c \"({filePath.Replace("\\", "/")}) (r) file runpdfbegin pdfpagecount = quit\"";
+            process.StartInfo.Arguments = $"-q -dNODISPLAY -dNOSAFER -c \"({FilePath.Replace("\\", "/")}) (r) file runpdfbegin pdfpagecount = quit\"";
 
             // Set these so a new window doesn't pop up
             process.StartInfo.UseShellExecute = false;
@@ -92,7 +92,10 @@ namespace FuzzyComic.ViewModels
         /// <summary>
         /// Called when un-loading the ViewModel
         /// </summary>
-        public override void CloseStreams() { }
+        public override void CloseStreams()
+        {
+            // Nothing to close here since LoadPage opens-and-closes the file every time :(
+        }
 
         /// <summary>
         /// Load the given page from the PDF
@@ -123,12 +126,10 @@ namespace FuzzyComic.ViewModels
                         collection.Read(FilePath, settings);
                         var img = collection[0];
 
-                        // Write a bitmap to a stream, then encode that as a skia image
-                        img.Write(stream, MagickFormat.Bmp3);
+                        // Write a PNG to a stream, then pass that to an Avalonia Bitmap
+                        img.Write(stream, MagickFormat.Png);
                         stream.Position = 0;
-                        var skiaImage = SKImage.FromEncodedData(stream.ToArray());
-                        var encoded = skiaImage.Encode();
-                        var bitmap = new Bitmap(encoded.AsStream());
+                        var bitmap = new Bitmap(stream);
 
                         // Clear the collection
                         collection.Clear();
@@ -139,19 +140,6 @@ namespace FuzzyComic.ViewModels
             }
 
             throw new System.Exception("Error loading page from PDF " + FilePath);
-        }
-
-        /// <summary>
-        /// Update the width of the progress bar at the bottom of the page
-        /// </summary>
-        protected override void UpdateProgressBarWidth()
-        {
-            if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                var windowWidth = desktop.MainWindow.Width;
-                var percentDone = (double)CurrentPageIndex / (double)NumberOfPages;
-                ProgressBarWidth = windowWidth * percentDone;
-            }
         }
     }
 }

@@ -1,9 +1,10 @@
-﻿using System.Reactive;
+﻿using System.Collections.Generic;
+using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.LogicalTree;
+using FuzzyComic.ViewModels.Comic;
 using FuzzyComic.Views;
 using ReactiveUI;
 
@@ -11,6 +12,15 @@ namespace FuzzyComic.ViewModels
 {
     public class MainWindowViewModel : ReactiveObject
     {
+        /// <summary> List of options that get passed to the file open dialog </summary>
+        private static readonly List<FileDialogFilter> FileFilterList = new List<FileDialogFilter>(new[] {
+            new FileDialogFilter() { Name = "Supported Formats", Extensions = { "cbz", "cbr", "zip", "rar", "pdf" } },
+            new FileDialogFilter() { Name = "Comic Book Archive", Extensions = { "cbz", "cbr" } },
+            new FileDialogFilter() { Name = "Image Archive", Extensions = { "zip", "rar" } },
+            new FileDialogFilter() { Name = "PDF", Extensions = { "pdf" } },
+            new FileDialogFilter() { Name = "All", Extensions = { "*" } }
+        });
+
         public MainWindowViewModel()
         {
             DoExit = ReactiveCommand.Create(RunExit);
@@ -20,11 +30,7 @@ namespace FuzzyComic.ViewModels
             DoNextPage = ReactiveCommand.CreateFromTask(RunNextPage);
             DoPreviousPage = ReactiveCommand.CreateFromTask(RunPreviousPage);
 
-            // CurrentComic = new ComicViewModel();
             CurrentOptions = new OptionsViewModel();
-
-            // TODO make sure this actually works...? OS should auto-close when the application is closed, but still...
-            // this.DetachedFromLogicalTree += (object sender, LogicalTreeAttachmentEventArgs args) => CurrentComic.CloseStreams();
         }
 
         /// <summary> Opens a file dialog to pick a comic </summary>
@@ -90,29 +96,28 @@ namespace FuzzyComic.ViewModels
                 var dialog = new OpenFileDialog();
                 dialog.Title = "Pick a comic";
                 dialog.AllowMultiple = false;
-                dialog.Filters.Add(new FileDialogFilter() { Name = "Supported Formats", Extensions = { "cbz", "cbr", "zip", "rar", "pdf" } });
-                dialog.Filters.Add(new FileDialogFilter() { Name = "Comic Book Archive", Extensions = { "cbz", "cbr" } });
-                dialog.Filters.Add(new FileDialogFilter() { Name = "Image Archive", Extensions = { "zip", "rar" } });
-                dialog.Filters.Add(new FileDialogFilter() { Name = "PDF", Extensions = { "pdf" } });
-                dialog.Filters.Add(new FileDialogFilter() { Name = "All", Extensions = { "*" } });
+                dialog.Filters.AddRange(FileFilterList);
 
                 var result = await dialog.ShowAsync(desktop.MainWindow);
-                if (result != null)
+                if (result != null && result.Length == 1)
                 {
                     // open the chosen file
                     var chosenPath = result[0];
 
+                    if (CurrentComic != null)
+                    {
+                        CurrentComic.CloseStreams();
+                        currentComic = null;
+                    }
+
+                    // Create the proper view model for the chosen file
                     if (chosenPath.EndsWith(".cbz") || chosenPath.EndsWith(".cbr") || chosenPath.EndsWith(".zip") || chosenPath.EndsWith(".rar"))
                     {
-                        var archiveViewModel = new ArchiveComicViewModel();
-                        await archiveViewModel.LoadArchive(chosenPath);
-                        CurrentComic = archiveViewModel;
+                        CurrentComic = await ArchiveComicViewModel.LoadArchive(chosenPath);
                     }
                     else if (chosenPath.EndsWith(".pdf"))
                     {
-                        var pdfViewModel = new PDFComicViewModel();
-                        await pdfViewModel.LoadPDF(chosenPath);
-                        CurrentComic = pdfViewModel;
+                        CurrentComic = await PDFComicViewModel.LoadPDF(chosenPath);
                     }
 
                     // hide all of the buttons; we do this via opacity 0 via styles

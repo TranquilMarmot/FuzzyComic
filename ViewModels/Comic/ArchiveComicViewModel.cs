@@ -1,17 +1,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media.Imaging;
 using SharpCompress.Archives;
 using SkiaSharp;
 
-namespace FuzzyComic.ViewModels
+namespace FuzzyComic.ViewModels.Comic
 {
-    /// <summary>
-    /// ViewModel for loading a .cbz (zip) or .cbr (rar) file as a comic
-    /// </summary>
+    /// <summary> ViewModel for loading a .cbz (zip) or .cbr (rar) file as a comic </summary>
     public class ArchiveComicViewModel : BaseComicViewModel
     {
         /// <summary> File stream for the currently open file </summary>
@@ -23,9 +19,7 @@ namespace FuzzyComic.ViewModels
         /// <summary> List of entries (pages) in the archive, sorted alphanumerically </summary>
         private List<IArchiveEntry> CurrentEntryList { get; set; }
 
-        /// <summary>
-        /// Close the file and archive streams
-        /// </summary>
+        /// <summary> Close the file and archive streams </summary>
         public override void CloseStreams()
         {
             if (CurrentArchive != null)
@@ -41,21 +35,29 @@ namespace FuzzyComic.ViewModels
             }
         }
 
-        /// <summary>
-        /// Load an archive (.zip or .rar) file
-        /// </summary>
         /// <param name="filePath">Path of file to load</param>
-        public async Task LoadArchive(string filePath)
+        private ArchiveComicViewModel(string filePath)
         {
-            CloseStreams();
-
             // open the file and sort the entries
             CurrentFileSteam = File.OpenRead(filePath);
             CurrentArchive = ArchiveFactory.Open(CurrentFileSteam);
             CurrentEntryList = EntriesToSortedList(CurrentArchive.Entries);
 
+            base.TotalPages = CurrentEntryList.Count;
+        }
+
+        /// <summary>
+        /// Load an archive (.zip or .rar) file
+        /// </summary>
+        /// <param name="filePath">Path of file to load</param>
+        public static async Task<ArchiveComicViewModel> LoadArchive(string filePath)
+        {
+            var viewModel = new ArchiveComicViewModel(filePath);
+
             // load the first page
-            await base.GoToPage(0);
+            await viewModel.GoToPage(0);
+
+            return viewModel;
         }
 
         /// <summary>
@@ -71,30 +73,12 @@ namespace FuzzyComic.ViewModels
                 return await Task.Run(() =>
                 {
                     // SkiaSharp is the underlying image library that Avalonia uses, so we use that here
-                    // First, we have to decode the image into a Skia bitmap
-                    // Then, re-encode that into a Skia image (this is in case i.e. we have bmp or jpeg and need png)
-                    // Then create a bitmap from the stream of that encoded image...
-                    // This isn't the most efficient thing ever, but it makes it so that we always have a compatible format
-                    var skiaBitmap = SKBitmap.Decode(entryStream); // TODO this returns null on error
-                    var skiaImage = SKImage.FromBitmap(skiaBitmap);
-                    var encoded = skiaImage.Encode();
-
-                    var bitmap = new Bitmap(encoded.AsStream());
+                    var bitmap = new Bitmap(SKData.Create(entryStream).AsStream());
                     return Task.FromResult(bitmap);
                 });
             }
 
             throw new System.Exception("Error loading page from archive");
-        }
-
-        protected override void UpdateProgressBarWidth()
-        {
-            if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                var windowWidth = desktop.MainWindow.Width;
-                var percentDone = (double)CurrentPageIndex / (double)CurrentEntryList.Count;
-                ProgressBarWidth = windowWidth * percentDone;
-            }
         }
 
         /// <summary>
@@ -107,7 +91,7 @@ namespace FuzzyComic.ViewModels
             var list = new List<IArchiveEntry>();
             foreach (var entry in entries)
             {
-                // skip directories for now...
+                // skip directories...
                 if (!entry.IsDirectory)
                 {
                     list.Add(entry);
