@@ -12,12 +12,12 @@ namespace FuzzyComic.ViewModels.Comic
     public class PDFComicViewModel : BaseComicViewModel
     {
         /// <summary>
-        /// Folder that contains GhostScript exe/dll for Windows machines.
+        /// Folder that contains Ghostscript exe/dll for Windows machines.
         /// 
         /// These are copied to the `bin` directory via a `Content Include` tag in the root `.csproj` file.
-        /// For Linux and macOS, we assume that the user has GhostScript installed already.
+        /// For Linux and macOS, we assume that the user has Ghostscript installed already.
         /// </summary>
-        private static string GhostScriptDirectoryWindows = $"{System.AppContext.BaseDirectory}/Ghostscript";
+        private static string GhostscriptDirectoryWindows = $"{System.AppContext.BaseDirectory}/Ghostscript";
 
         /// <summary> Full path of PDF file </summary>
         private string FilePath;
@@ -38,7 +38,7 @@ namespace FuzzyComic.ViewModels.Comic
             // if we're on Windows, use the included .dll and .exe files
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                MagickNET.SetGhostscriptDirectory(GhostScriptDirectoryWindows);
+                MagickNET.SetGhostscriptDirectory(GhostscriptDirectoryWindows);
             }
 
             var viewModel = new PDFComicViewModel(filePath);
@@ -56,21 +56,21 @@ namespace FuzzyComic.ViewModels.Comic
         /// <returns>Number of pages in the PDF</returns>
         private int GetNumberOfPages()
         {
-            // Run the GhostScript executable to get the number of pages
+            // Run the Ghostscript executable to get the number of pages
             var process = new System.Diagnostics.Process();
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                // if we're on Windows, we want to use the included GhostScript executable
-                process.StartInfo.FileName = $"{GhostScriptDirectoryWindows}\\gswin64c.exe";
+                // if we're on Windows, we want to use the included Ghostscript executable
+                process.StartInfo.FileName = $"{GhostscriptDirectoryWindows}\\gswin64c.exe";
             }
             else
             {
-                // otherwise, we have to assume the user has GhostScript installed
+                // otherwise, we have to assume the user has Ghostscript installed
                 process.StartInfo.FileName = "gs";
             }
 
-            // This GhostScript command will (quickly) output the number of pages in the PDF
+            // This Ghostscript command will (quickly) output the number of pages in the PDF
             process.StartInfo.Arguments = $"-q -dNODISPLAY -dNOSAFER -c \"({FilePath.Replace("\\", "/")}) (r) file runpdfbegin pdfpagecount = quit\"";
 
             // Set these so a new window doesn't pop up
@@ -87,9 +87,9 @@ namespace FuzzyComic.ViewModels.Comic
             }
             catch (System.ComponentModel.Win32Exception e)
             {
-                // TODO show a message box here about how to install GhostScript on Linux and macOS
+                // TODO show a message box here about how to install Ghostscript on Linux and macOS
                 // fallback to an error and return 1...
-                System.Console.Error.WriteLine($"Couldn't call out to GhostScript executable to get number of pages; does the user have GhostScript installed?\nError: {e.Message}");
+                System.Console.Error.WriteLine($"Couldn't call out to Ghostscript executable to get number of pages; does the user have Ghostscript installed?\nError: {e.Message}");
                 return 1;
             }
 
@@ -104,7 +104,7 @@ namespace FuzzyComic.ViewModels.Comic
             }
             else
             {
-                // this will potentially be error output from GhostScript
+                // this will potentially be error output from Ghostscript
                 System.Console.Error.WriteLine($"Error getting number of pages in PDF. Got output:\n{strOutput}");
 
                 // Note: By default we do 1 instead of 0 to avoid divide by zero errors
