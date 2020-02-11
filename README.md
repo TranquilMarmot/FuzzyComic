@@ -2,20 +2,20 @@
 
 ## About
 
-FuzzyComic is a **simple** comic reader, tailored for use on touch-screen devices.
+FuzzyComic is a **simple** comic reader, tailored for use on touch-screen devices. It currently runs on Windows, Linux, and macOS.
 
-Currently, it is capable of reading [`.cbz` (comic book zip) and `.cbr` (comic book rar)](https://en.wikipedia.org/wiki/Comic_book_archive) files. It will go through images in the archive in alphanumerical order.
+Currently, FuzzyComic is capable of reading [`.cbz` (comic book zip) and `.cbr` (comic book rar)](https://en.wikipedia.org/wiki/Comic_book_archive) and `.pdf` files. It will go through images in archives in alphanumerical order.
 
-It does _not_ have any fancy library or comics detection built-in. It simply opens the files you tell it to.
+Double-tap the middle of the screen to open up the main menu. FuzzyComic does _not_ have any fancy library or comics detection built-in. It simply opens the files you tell it to.
 
-It has a small progress bar on the bottom of the screen, and a configurable background color.
+There is a small progress bar on the bottom of the screen, and a configurable background color.
 
 <img src="Images/ui.png" width="500px">
 <img src="Images/ui-reading.png" width="500px">
 
 ## Running
 
-First, you will need to [download .NET Core](https://dotnet.microsoft.com/download) for your operating system.
+First, you will need to [install .NET Core](https://dotnet.microsoft.com/download) for your operating system.
 
 Before running, you'll have to install dependencies with
 
@@ -39,6 +39,8 @@ Archive decompression is done using [SharpCompress](https://github.com/adamhathc
 
 ---
 
-PDF loading is done via ImageMagick using [Magick.NET](https://github.com/dlemstra/Magick.NET).
+PDF loading is done via ImageMagick using [Magick.NET](https://github.com/dlemstra/Magick.NET). This requires a dependency on [Ghostscript](https://www.ghostscript.com/) to rasterize PDFs.
 
-**NOTE:** Currently, loading PDFs on Linux/macOS also requires that you install the latest version of [Ghostscript](https://www.ghostscript.com/download/gsdnld.html).
+Currently, loading PDFs on Linux/macOS requires that you install the latest version of [Ghostscript](https://www.ghostscript.com/download/gsdnld.html). On Windows, the proper `.dll` and `.exe` files are included in the `Ghostscript` folder in this repo.
+
+**NOTE:** Ghostscript is licensed under AGPL, so be careful if you're distributing the source for this project!
