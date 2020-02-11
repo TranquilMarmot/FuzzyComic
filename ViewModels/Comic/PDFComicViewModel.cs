@@ -1,4 +1,5 @@
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 using ImageMagick;
@@ -11,11 +12,12 @@ namespace FuzzyComic.ViewModels.Comic
     public class PDFComicViewModel : BaseComicViewModel
     {
         /// <summary>
-        /// Folder that contains GhostScript exe/dll.
+        /// Folder that contains GhostScript exe/dll for Windows machines.
         /// 
         /// These are copied to the `bin` directory via a `Content Include` tag in the root `.csproj` file.
+        /// For Linux and macOS, we assume that the user has GhostScript installed already.
         /// </summary>
-        private static string GhostScriptDirectory = $"{System.AppContext.BaseDirectory}\\Ghostscript";
+        private static string GhostScriptDirectoryWindows = $"{System.AppContext.BaseDirectory}/Ghostscript";
 
         /// <summary> Full path of PDF file </summary>
         private string FilePath;
@@ -33,8 +35,11 @@ namespace FuzzyComic.ViewModels.Comic
         /// <returns>ViewModel that shows a PDF comic</returns>
         public static async Task<PDFComicViewModel> LoadPDF(string filePath)
         {
-            // TODO Figure out how this works on Linux/macOS?
-            MagickNET.SetGhostscriptDirectory(GhostScriptDirectory);
+            // if we're on Windows, use the included .dll and .exe files
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                MagickNET.SetGhostscriptDirectory(GhostScriptDirectoryWindows);
+            }
 
             var viewModel = new PDFComicViewModel(filePath);
 
@@ -51,10 +56,19 @@ namespace FuzzyComic.ViewModels.Comic
         /// <returns>Number of pages in the PDF</returns>
         private int GetNumberOfPages()
         {
-            // Run the GhostScript executable
-            // TODO: Figure out how to run this on Linux/macOS
+            // Run the GhostScript executable to get the number of pages
             var process = new System.Diagnostics.Process();
-            process.StartInfo.FileName = $"{GhostScriptDirectory}\\gswin64c.exe";
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                // if we're on Windows, we want to use the included GhostScript executable
+                process.StartInfo.FileName = $"{GhostScriptDirectoryWindows}\\gswin64c.exe";
+            }
+            else
+            {
+                // otherwise, we have to assume the user has GhostScript installed
+                process.StartInfo.FileName = "gs";
+            }
 
             // This GhostScript command will (quickly) output the number of pages in the PDF
             process.StartInfo.Arguments = $"-q -dNODISPLAY -dNOSAFER -c \"({FilePath.Replace("\\", "/")}) (r) file runpdfbegin pdfpagecount = quit\"";
@@ -67,12 +81,20 @@ namespace FuzzyComic.ViewModels.Comic
             process.StartInfo.RedirectStandardOutput = true;
 
             // Start the process
-            process.Start();
+            try
+            {
+                process.Start();
+            }
+            catch (System.ComponentModel.Win32Exception e)
+            {
+                // TODO show a message box here about how to install GhostScript on Linux and macOS
+                // fallback to an error and return 1...
+                System.Console.Error.WriteLine($"Couldn't call out to GhostScript executable to get number of pages; does the user have GhostScript installed?\nError: {e.Message}");
+                return 1;
+            }
 
-            // Get program output
+            // Get program output and wait for the process to finish
             string strOutput = process.StandardOutput.ReadToEnd();
-
-            // Wait for process to finish
             process.WaitForExit();
 
             int output;
@@ -82,11 +104,12 @@ namespace FuzzyComic.ViewModels.Comic
             }
             else
             {
+                // this will potentially be error output from GhostScript
                 System.Console.Error.WriteLine($"Error getting number of pages in PDF. Got output:\n{strOutput}");
-            }
 
-            // Note: By default we do 1 instead of 0 to avoid divide by zero errors
-            return 1;
+                // Note: By default we do 1 instead of 0 to avoid divide by zero errors
+                return 1;
+            }
         }
 
         /// <summary>

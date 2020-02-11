@@ -82,7 +82,7 @@ namespace FuzzyComic.ViewModels.Comic
         {
             if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                var windowWidth = desktop.MainWindow.Width;
+                var windowWidth = desktop.MainWindow.Width; // TODO On some platforms this will be NaN at startup?
                 var percentDone = (double)CurrentPageIndex / (double)TotalPages;
                 ProgressBarWidth = windowWidth * percentDone;
             }
