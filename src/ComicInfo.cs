@@ -9,5 +9,7 @@ namespace FuzzyComic
     public struct ComicInfo
     {
         public int PageNumber { get; set; }
+
+        public bool MangaMode { get; set; }
     }
 }

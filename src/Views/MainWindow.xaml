@@ -64,7 +64,7 @@
       ColumnDefinitions="*,*,*" 
       Name="navigationButtonsContainer">
       <Button Grid.Row="0" 
-        Grid.Column="{Binding PreviousPageColumn}" 
+        Grid.Column="{Binding CurrentComic.PreviousPageColumn, FallbackValue=0}" 
         Grid.RowSpan="3"
         Command="{Binding DoPreviousPage}" 
         Content="Previous Page" 
@@ -81,7 +81,7 @@
         Cursor="Hand" />
 
       <Button Grid.Row="0" 
-        Grid.Column="{Binding NextPageColumn}"
+        Grid.Column="{Binding CurrentComic.NextPageColumn, FallbackValue=2}"
         Grid.RowSpan="3"
         Command="{Binding DoNextPage}" 
         Content="Next Page" 
@@ -134,7 +134,7 @@
                 Margin="15" 
                 Background="Black" />
 
-          <CheckBox Content="Manga Mode (Swap Next/Previous)" IsChecked="{Binding MangaMode}" />
+          <CheckBox Content="Manga Mode (Swap Next/Previous)" IsChecked="{Binding CurrentComic.MangaMode, FallbackValue=false}" />
 
           <Separator Height="1" 
                 Width="100" 

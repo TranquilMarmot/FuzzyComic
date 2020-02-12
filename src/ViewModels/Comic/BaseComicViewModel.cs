@@ -9,6 +9,12 @@ namespace FuzzyComic.ViewModels.Comic
     /// <summary> Represents a comic that is being displayed </summary>
     public abstract class BaseComicViewModel : ReactiveObject
     {
+        /// <summary> Column in grid of the main left button (default previous button placement) </summary>
+        private static readonly int LeftMainButtonColumn = 0;
+
+        /// <summary> Column in grid of the main right button (default next button placement) </summary>
+        private static readonly int RightMainButtonColumn = 2;
+
         /// <summary>
         /// Load a specific page number and get back a bitmap image to display
         /// </summary>
@@ -64,6 +70,54 @@ namespace FuzzyComic.ViewModels.Comic
             }
         }
 
+        private int previousPageColumn = LeftMainButtonColumn;
+
+        /// <summary>
+        /// Grid column that previous page button is in.
+        /// Swapped with next page column for manga mode.
+        /// </summary>
+        public int PreviousPageColumn
+        {
+            get { return this.previousPageColumn; }
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.previousPageColumn, value);
+            }
+        }
+
+        private int nextPageColumn = RightMainButtonColumn;
+
+        /// <summary>
+        /// Grid column that next page button is in.
+        /// Swapped with previous page column for manga mode.
+        /// </summary>
+        public int NextPageColumn
+        {
+            get { return this.nextPageColumn; }
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.nextPageColumn, value);
+            }
+        }
+
+        private bool mangaMode;
+
+        /// <summary>
+        /// Whether or not to swap the previous/next buttons
+        /// </summary>
+        public bool MangaMode
+        {
+            get { return this.mangaMode; }
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.mangaMode, value);
+
+                PreviousPageColumn = value ? RightMainButtonColumn : LeftMainButtonColumn;
+                NextPageColumn = value ? LeftMainButtonColumn : RightMainButtonColumn;
+
+            }
+        }
+
         /// <summary>
         /// Create a new comic view model.
         /// 
@@ -91,6 +145,8 @@ namespace FuzzyComic.ViewModels.Comic
                 // fresh one, start at the beginning
                 await GoToPage(0);
             }
+
+            MangaMode = currentInfo.MangaMode;
         }
 
         /// <summary>
@@ -111,6 +167,7 @@ namespace FuzzyComic.ViewModels.Comic
             }
 
             currentInfo.PageNumber = page;
+            currentInfo.MangaMode = MangaMode;
             UserSettings.CurrentSettings.comicList[FilePath] = currentInfo;
             await UserSettings.SaveToFile();
         }
