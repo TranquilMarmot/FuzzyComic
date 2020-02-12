@@ -27,7 +27,7 @@
                 The order in this list MUST match the BackgroundColors dictionary in the corresponding class
                 The "Name" of each ComboBoxItem is used to look up the colors
             -->
-            <ComboBox SelectedIndex="{Binding SelectedBackgroundColorIndex}" 
+            <ComboBox SelectedItem="{Binding SelectedBackgroundColorName}" 
                 Height="40" 
                 Width="40" 
                 Name="backgroundColorComboBox">

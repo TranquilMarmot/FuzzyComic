@@ -61,16 +61,16 @@ namespace FuzzyComic.ViewModels
             }
         }
 
-        private int selectedBackgroundColorIndex;
+        private string selectedBackgroundColorName;
 
         /// <summary>
         /// Index in the ComboBox of the selected color.
         /// This is only really used to read the selected color from the Settings.
         /// </summary>
-        public int SelectedBackgroundColorIndex
+        public string SelectedBackgroundColorName
         {
-            get { return this.selectedBackgroundColorIndex; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedBackgroundColorIndex, value); }
+            get { return this.selectedBackgroundColorName; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedBackgroundColorName, value); }
         }
 
         public Color selectedBackgroundColor;
@@ -91,8 +91,8 @@ namespace FuzzyComic.ViewModels
         public void ApplySettings(Settings settings)
         {
             this.IsFullScreen = settings.isFullScreen.Value;
-            this.SelectedBackgroundColorIndex = OptionsWindow.BackgroundColors.Keys.ToList().IndexOf(settings.backgroundColor);
-            this.SelectedBackgroundColor = OptionsWindow.BackgroundColors.Values.ToList()[this.SelectedBackgroundColorIndex];
+            this.SelectedBackgroundColorName = settings.backgroundColor;
+            this.SelectedBackgroundColor = OptionsWindow.BackgroundColors[this.SelectedBackgroundColorName];
         }
 
         /// <summary> Copy this view model out to a Settings object </summary>
@@ -101,7 +101,7 @@ namespace FuzzyComic.ViewModels
         {
             var settings = new Settings();
             settings.isFullScreen = this.IsFullScreen;
-            settings.backgroundColor = OptionsWindow.BackgroundColors.Keys.ToList()[this.SelectedBackgroundColorIndex];
+            settings.backgroundColor = this.SelectedBackgroundColorName;
             return settings;
         }
 

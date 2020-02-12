@@ -54,7 +54,7 @@ namespace FuzzyComic.Views
 
                 // set the selected index and color
                 var dataContext = (OptionsViewModel)this.DataContext;
-                dataContext.SelectedBackgroundColorIndex = BackgroundColors.Keys.ToList().IndexOf(item.Name);
+                dataContext.SelectedBackgroundColorName = item.Name;
                 dataContext.SelectedBackgroundColor = color;
             }
         }

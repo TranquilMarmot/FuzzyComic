@@ -67,6 +67,8 @@ namespace FuzzyComic
 
         public static void SaveToFile(Settings settings)
         {
+            System.Console.WriteLine($"Saving settings to {SettingsFilePath}...");
+
             // make sure the directory exists
             Directory.CreateDirectory(SettingsDirectory);
 
