@@ -81,7 +81,7 @@ namespace FuzzyComic
         {
             if (!File.Exists(SettingsFilePath))
             {
-                System.Console.WriteLine("Settings file does not exist, returning default");
+                System.Console.WriteLine($"Settings file does not exist at {SettingsFilePath}, returning default");
                 return Settings.Default();
             }
 
@@ -89,7 +89,7 @@ namespace FuzzyComic
 
             using (var file = File.OpenRead(SettingsFilePath))
             {
-                System.Console.WriteLine("Loading settings from file...");
+                System.Console.WriteLine($"Loading settings from {SettingsFilePath}...");
                 return Settings.MergeWithDefaults((Settings)reader.Deserialize(file));
             }
         }
