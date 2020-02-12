@@ -1,3 +1,4 @@
+using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -27,14 +28,33 @@ namespace FuzzyComic.ViewModels.Comic
         /// </summary>
         public abstract void CloseStreams();
 
-        /// <summary> Index of the page currently being displayed </summary>
-        public int CurrentPageIndex { get; set; }
-
-        /// <summary>Total number of pages in the comic</summary>
-        public int TotalPages { get; set; }
-
         /// <summary> Path that this comic lives at </summary>
         public string FilePath { get; set; }
+
+        private int currentPageIndex;
+
+        /// <summary> Index of the page currently being displayed </summary>
+        public int CurrentPageIndex
+        {
+            get { return this.currentPageIndex; }
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.currentPageIndex, value);
+            }
+        }
+
+        private int totalPages;
+
+        /// <summary>Total number of pages in the comic</summary>
+        public int TotalPages
+        {
+            get { return this.totalPages; }
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.totalPages, value);
+            }
+        }
+
 
         /// <summary>Image of the current page being displayed</summary>
         private Bitmap currentPageBitmap;
@@ -118,6 +138,9 @@ namespace FuzzyComic.ViewModels.Comic
             }
         }
 
+        /// <summary> Go to a specified page </summary>
+        public ReactiveCommand<Unit, Task> DoGoToPage { get; }
+
         /// <summary>
         /// Create a new comic view model.
         /// 
@@ -127,6 +150,7 @@ namespace FuzzyComic.ViewModels.Comic
         protected BaseComicViewModel(string filePath)
         {
             FilePath = filePath;
+            DoGoToPage = ReactiveCommand.Create(RunGoToCurrentPage);
         }
 
         /// <summary>
@@ -147,6 +171,12 @@ namespace FuzzyComic.ViewModels.Comic
             }
 
             MangaMode = currentInfo.MangaMode;
+        }
+
+        /// <summary> Run when the "Go" to page button is clicked </summary>
+        private async Task RunGoToCurrentPage()
+        {
+            await GoToPage(CurrentPageIndex);
         }
 
         /// <summary>

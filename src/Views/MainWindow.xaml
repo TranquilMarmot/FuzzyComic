@@ -142,10 +142,10 @@
 
           <StackPanel Orientation="Horizontal">
             <TextBlock Text="Page" />
-            <TextBox />
+            <TextBox Text="{Binding CurrentComic.CurrentPageIndex}" />
             <TextBlock Text="Of" />
-            <TextBlock Text="100" />
-            <Button Content="Go" Cursor="Hand" />
+            <TextBlock Text="{Binding CurrentComic.TotalPages}" />
+            <Button Content="Go" Cursor="Hand" Command="{Binding CurrentComic.DoGoToPage}" />
           </StackPanel>
         </StackPanel>
       </Border>
