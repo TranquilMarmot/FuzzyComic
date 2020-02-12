@@ -64,8 +64,8 @@
       ColumnDefinitions="*,*,*" 
       Name="navigationButtonsContainer">
       <Button Grid.Row="0" 
-        Grid.Column="0" 
-        Grid.RowSpan="3" 
+        Grid.Column="{Binding PreviousPageColumn}" 
+        Grid.RowSpan="3"
         Command="{Binding DoPreviousPage}" 
         Content="Previous Page" 
         Cursor="Hand" />
@@ -81,8 +81,8 @@
         Cursor="Hand" />
 
       <Button Grid.Row="0" 
-        Grid.Column="2" 
-        Grid.RowSpan="3" 
+        Grid.Column="{Binding NextPageColumn}"
+        Grid.RowSpan="3"
         Command="{Binding DoNextPage}" 
         Content="Next Page" 
         Cursor="Hand" />
@@ -128,6 +128,25 @@
             Classes="mainMenuButton" 
             Command="{Binding DoExit}" 
             Cursor="Hand" />
+
+          <Separator Height="1" 
+                Width="100" 
+                Margin="15" 
+                Background="Black" />
+
+          <CheckBox Content="Manga Mode (Swap Next/Previous)" IsChecked="{Binding MangaMode}" />
+
+          <Separator Height="1" 
+                Width="100" 
+                Margin="15" />
+
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Page" />
+            <TextBox />
+            <TextBlock Text="Of" />
+            <TextBlock Text="100" />
+            <Button Content="Go" Cursor="Hand" />
+          </StackPanel>
         </StackPanel>
       </Border>
     </Grid>
