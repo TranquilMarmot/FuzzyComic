@@ -31,15 +31,17 @@ namespace FuzzyComic.ViewModels.Comic
         /// <summary> Path that this comic lives at </summary>
         public string FilePath { get; set; }
 
-        private int currentPageIndex;
+        public int CurrentPageIndex { get; set; }
 
-        /// <summary> Index of the page currently being displayed </summary>
-        public int CurrentPageIndex
+        private int enteredPageIndex;
+
+        /// <summary> Page number entered into the textbox of the main menu. Used to navigate to specific pages. </summary>
+        public int EnteredPageIndex
         {
-            get { return this.currentPageIndex; }
+            get { return this.enteredPageIndex; }
             set
             {
-                this.RaiseAndSetIfChanged(ref this.currentPageIndex, value);
+                this.RaiseAndSetIfChanged(ref this.enteredPageIndex, value);
             }
         }
 
@@ -176,7 +178,8 @@ namespace FuzzyComic.ViewModels.Comic
         /// <summary> Run when the "Go" to page button is clicked </summary>
         private async Task RunGoToCurrentPage()
         {
-            await GoToPage(CurrentPageIndex);
+            // page index starts at 0, but we want to display it as starting at 1
+            await GoToPage(EnteredPageIndex - 1);
         }
 
         /// <summary>
@@ -185,21 +188,25 @@ namespace FuzzyComic.ViewModels.Comic
         /// <param name="page">Page number to go to</param>
         public async Task GoToPage(int page)
         {
-            CurrentPageIndex = page;
-            CurrentPage = await LoadPage(CurrentPageIndex);
-
-            UpdateProgressBarWidth();
-
-            ComicInfo currentInfo;
-            if (!UserSettings.CurrentSettings.comicList.TryGetValue(FilePath, out currentInfo))
+            if (page < TotalPages && page >= 0)
             {
-                currentInfo = new ComicInfo();
-            }
+                EnteredPageIndex = page + 1; // update the text box that shows the current page
+                CurrentPageIndex = page;
+                CurrentPage = await LoadPage(CurrentPageIndex);
 
-            currentInfo.PageNumber = page;
-            currentInfo.MangaMode = MangaMode;
-            UserSettings.CurrentSettings.comicList[FilePath] = currentInfo;
-            await UserSettings.SaveToFile();
+                UpdateProgressBarWidth();
+
+                ComicInfo currentInfo;
+                if (!UserSettings.CurrentSettings.comicList.TryGetValue(FilePath, out currentInfo))
+                {
+                    currentInfo = new ComicInfo();
+                }
+
+                currentInfo.PageNumber = page;
+                currentInfo.MangaMode = MangaMode;
+                UserSettings.CurrentSettings.comicList[FilePath] = currentInfo;
+                await UserSettings.SaveToFile();
+            }
         }
 
         /// <summary>
@@ -212,7 +219,7 @@ namespace FuzzyComic.ViewModels.Comic
             if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 var windowWidth = desktop.MainWindow.Width; // TODO On some platforms this will be NaN at startup?
-                var percentDone = (double)CurrentPageIndex / (double)TotalPages;
+                var percentDone = (double)(CurrentPageIndex + 1) / (double)TotalPages;
                 ProgressBarWidth = windowWidth * percentDone;
             }
         }
