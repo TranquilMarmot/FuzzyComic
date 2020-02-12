@@ -36,7 +36,7 @@ namespace FuzzyComic.ViewModels.Comic
         }
 
         /// <param name="filePath">Path of file to load</param>
-        private ArchiveComicViewModel(string filePath)
+        public ArchiveComicViewModel(string filePath) : base(filePath)
         {
             // open the file and sort the entries
             CurrentFileSteam = File.OpenRead(filePath);
@@ -44,20 +44,6 @@ namespace FuzzyComic.ViewModels.Comic
             CurrentEntryList = EntriesToSortedList(CurrentArchive.Entries);
 
             base.TotalPages = CurrentEntryList.Count;
-        }
-
-        /// <summary>
-        /// Load an archive (.zip or .rar) file
-        /// </summary>
-        /// <param name="filePath">Path of file to load</param>
-        public static async Task<ArchiveComicViewModel> LoadArchive(string filePath)
-        {
-            var viewModel = new ArchiveComicViewModel(filePath);
-
-            // load the first page
-            await viewModel.GoToPage(0);
-
-            return viewModel;
         }
 
         /// <summary>

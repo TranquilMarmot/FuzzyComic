@@ -95,16 +95,6 @@ namespace FuzzyComic.ViewModels
             this.SelectedBackgroundColor = OptionsWindow.BackgroundColors[this.SelectedBackgroundColorName];
         }
 
-        /// <summary> Copy this view model out to a Settings object </summary>
-        /// <returns> Settings object with the settings from this view model </returns>
-        public Settings CopyToSettings()
-        {
-            var settings = new Settings();
-            settings.isFullScreen = this.IsFullScreen;
-            settings.backgroundColor = this.SelectedBackgroundColorName;
-            return settings;
-        }
-
         /// <summary> Cancel options changes </summary>
         private void RunCancel()
         {
@@ -114,12 +104,11 @@ namespace FuzzyComic.ViewModels
         }
 
         /// <summary> Save options changes </summary>
-        private void RunSave()
+        private async void RunSave()
         {
-            // copy the changed settings to a Settings object and save it
-            var settings = this.CopyToSettings();
-            UserSettings.SaveToFile(settings);
-            UserSettings.CurrentSettings = settings;
+            UserSettings.CurrentSettings.isFullScreen = this.IsFullScreen;
+            UserSettings.CurrentSettings.backgroundColor = this.SelectedBackgroundColorName;
+            await UserSettings.SaveToFile();
             CloseOptionsWindow();
         }
     }

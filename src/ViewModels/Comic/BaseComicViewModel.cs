@@ -27,6 +27,9 @@ namespace FuzzyComic.ViewModels.Comic
         /// <summary>Total number of pages in the comic</summary>
         public int TotalPages { get; set; }
 
+        /// <summary> Path that this comic lives at </summary>
+        public string FilePath { get; set; }
+
         /// <summary>Image of the current page being displayed</summary>
         private Bitmap currentPageBitmap;
 
@@ -62,6 +65,35 @@ namespace FuzzyComic.ViewModels.Comic
         }
 
         /// <summary>
+        /// Create a new comic view model.
+        /// 
+        /// After this is called, the `Open` function should be called afterward to actually load the comic.
+        /// </summary>
+        /// <param name="filePath"></param>
+        protected BaseComicViewModel(string filePath)
+        {
+            FilePath = filePath;
+        }
+
+        /// <summary>
+        /// Will open a comic to the last page it was on, or at the beginning if it's never been opened before.
+        /// </summary>
+        public async Task Open()
+        {
+            ComicInfo currentInfo;
+            if (UserSettings.CurrentSettings.comicList.TryGetValue(FilePath, out currentInfo))
+            {
+                // we've opened this comic before; go to the page we stopped on
+                await GoToPage(currentInfo.PageNumber);
+            }
+            else
+            {
+                // fresh one, start at the beginning
+                await GoToPage(0);
+            }
+        }
+
+        /// <summary>
         /// Go to a specific page
         /// </summary>
         /// <param name="page">Page number to go to</param>
@@ -71,6 +103,16 @@ namespace FuzzyComic.ViewModels.Comic
             CurrentPage = await LoadPage(CurrentPageIndex);
 
             UpdateProgressBarWidth();
+
+            ComicInfo currentInfo;
+            if (!UserSettings.CurrentSettings.comicList.TryGetValue(FilePath, out currentInfo))
+            {
+                currentInfo = new ComicInfo();
+            }
+
+            currentInfo.PageNumber = page;
+            UserSettings.CurrentSettings.comicList[FilePath] = currentInfo;
+            await UserSettings.SaveToFile();
         }
 
         /// <summary>

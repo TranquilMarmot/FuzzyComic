@@ -15,25 +15,12 @@ namespace FuzzyComic.ViewModels.Comic
         /// Folder that contains Ghostscript exe/dll for Windows machines.
         /// 
         /// These are copied to the `bin` directory via a `Content Include` tag in the root `.csproj` file.
+        /// 
         /// For Linux and macOS, we assume that the user has Ghostscript installed already.
         /// </summary>
-        private static string GhostscriptDirectoryWindows = $"{System.AppContext.BaseDirectory}/Ghostscript";
+        private static string GhostscriptDirectoryWindows = Path.Combine(System.AppContext.BaseDirectory, "Ghostscript");
 
-        /// <summary> Full path of PDF file </summary>
-        private string FilePath;
-
-        private PDFComicViewModel(string filePath)
-        {
-            FilePath = filePath;
-            TotalPages = GetNumberOfPages();
-        }
-
-        /// <summary>
-        /// Load a PDF file
-        /// </summary>
-        /// <param name="filePath">Path of file to load</param>
-        /// <returns>ViewModel that shows a PDF comic</returns>
-        public static async Task<PDFComicViewModel> LoadPDF(string filePath)
+        public PDFComicViewModel(string filePath) : base(filePath)
         {
             // if we're on Windows, use the included .dll and .exe files
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -41,12 +28,7 @@ namespace FuzzyComic.ViewModels.Comic
                 MagickNET.SetGhostscriptDirectory(GhostscriptDirectoryWindows);
             }
 
-            var viewModel = new PDFComicViewModel(filePath);
-
-            // Load the first page
-            await viewModel.GoToPage(0);
-
-            return viewModel;
+            base.TotalPages = GetNumberOfPages();
         }
 
         /// <summary>
@@ -71,7 +53,7 @@ namespace FuzzyComic.ViewModels.Comic
             }
 
             // This Ghostscript command will (quickly) output the number of pages in the PDF
-            process.StartInfo.Arguments = $"-q -dNODISPLAY -dNOSAFER -c \"({FilePath.Replace("\\", "/")}) (r) file runpdfbegin pdfpagecount = quit\"";
+            process.StartInfo.Arguments = $"-q -dNODISPLAY -dNOSAFER -c \"({base.FilePath.Replace("\\", "/")}) (r) file runpdfbegin pdfpagecount = quit\"";
 
             // Set these so a new window doesn't pop up
             process.StartInfo.UseShellExecute = false;
@@ -146,7 +128,7 @@ namespace FuzzyComic.ViewModels.Comic
                         settings.Density = new Density(200);
 
                         // Read only the given page of the pdf file
-                        collection.Read(FilePath, settings);
+                        collection.Read(base.FilePath, settings);
                         var img = collection[0];
 
                         // Write a PNG to a stream, then pass that to an Avalonia Bitmap

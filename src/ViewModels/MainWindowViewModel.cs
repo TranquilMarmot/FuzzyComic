@@ -113,12 +113,18 @@ namespace FuzzyComic.ViewModels
                     // Create the proper view model for the chosen file
                     if (chosenPath.EndsWith(".cbz") || chosenPath.EndsWith(".cbr") || chosenPath.EndsWith(".zip") || chosenPath.EndsWith(".rar"))
                     {
-                        CurrentComic = await ArchiveComicViewModel.LoadArchive(chosenPath);
+                        CurrentComic = new ArchiveComicViewModel(chosenPath);
                     }
                     else if (chosenPath.EndsWith(".pdf"))
                     {
-                        CurrentComic = await PDFComicViewModel.LoadPDF(chosenPath);
+                        CurrentComic = new PDFComicViewModel(chosenPath);
                     }
+                    else
+                    {
+                        System.Console.Error.WriteLine($"Unsupported format for file {chosenPath}!");
+                    }
+
+                    await CurrentComic.Open();
 
                     // hide all of the buttons; we do this via opacity 0 via styles
                     // so that they can still be hit

@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace FuzzyComic
 {
@@ -8,9 +11,11 @@ namespace FuzzyComic
     /// </summary>
     public struct Settings
     {
-        public bool? isFullScreen;
+        public bool? isFullScreen { get; set; }
 
-        public String backgroundColor;
+        public String backgroundColor { get; set; }
+
+        public Dictionary<string, ComicInfo> comicList { get; set; }
 
         /// <summary>
         /// Returns the default settings, for use if no settings file exists
@@ -25,6 +30,8 @@ namespace FuzzyComic
             // See OptionsWindow class for definitions of the colors
             defaults.backgroundColor = "backgroundColorBlack";
 
+            defaults.comicList = new Dictionary<string, ComicInfo>();
+
             return defaults;
         }
 
@@ -32,7 +39,7 @@ namespace FuzzyComic
         /// Merge the given settings with the defaults; if any keys in the given settings don't have values,
         /// they will be set to the defaults.
         ///
-        /// This is mainly for when new settings are added and aren't in the serialized settings XML.
+        /// This is mainly for when new settings are added and aren't in the serialized settings JSON.
         /// </summary>
         /// <param name="settings">Settings to merge with defaults</param>
         /// <returns>Settings with default values for key the given settings didn't have</returns>
@@ -50,6 +57,11 @@ namespace FuzzyComic
                 merged.backgroundColor = settings.backgroundColor;
             }
 
+            if (settings.comicList != null)
+            {
+                merged.comicList = settings.comicList;
+            }
+
             return merged;
         }
     }
@@ -59,23 +71,23 @@ namespace FuzzyComic
     /// </summary>
     public static class UserSettings
     {
+        /// <summary> Current settings; this is loaded when the application starts.</summary>
         public static Settings CurrentSettings = Settings.Default();
 
+        /// <summary> Directory at which to find the settings file </summary>
         public static string SettingsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FuzzyComic");
 
-        public static string SettingsFilePath = Path.Combine(SettingsDirectory, "Settings.xml");
+        /// <summary> Actual path to the settings file </summary>
+        public static string SettingsFilePath = Path.Combine(SettingsDirectory, "Settings.json");
 
-        public static void SaveToFile(Settings settings)
+        public static async Task SaveToFile()
         {
-            System.Console.WriteLine($"Saving settings to {SettingsFilePath}...");
-
             // make sure the directory exists
             Directory.CreateDirectory(SettingsDirectory);
 
-            var writer = new System.Xml.Serialization.XmlSerializer(typeof(Settings));
-            using (var file = File.Create(SettingsFilePath))
+            using (FileStream fs = File.Create(SettingsFilePath))
             {
-                writer.Serialize(file, settings);
+                await JsonSerializer.SerializeAsync<Settings>(fs, CurrentSettings);
             }
         }
 
@@ -87,13 +99,9 @@ namespace FuzzyComic
                 return Settings.Default();
             }
 
-            var reader = new System.Xml.Serialization.XmlSerializer(typeof(Settings));
+            var deserialized = JsonSerializer.Deserialize<Settings>(File.ReadAllText(SettingsFilePath));
 
-            using (var file = File.OpenRead(SettingsFilePath))
-            {
-                System.Console.WriteLine($"Loading settings from {SettingsFilePath}...");
-                return Settings.MergeWithDefaults((Settings)reader.Deserialize(file));
-            }
+            return Settings.MergeWithDefaults(deserialized);
         }
 
     }
