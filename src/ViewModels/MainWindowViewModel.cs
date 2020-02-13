@@ -113,6 +113,13 @@ namespace FuzzyComic.ViewModels
                         currentComic = null;
                     }
 
+                    // hide all of the buttons; we do this via opacity 0 via styles
+                    // so that they can still be hit
+                    NavigationButtonsContainer.Classes.Add("invisible");
+
+                    // also, make sure the main menu is closed
+                    this.RunCloseMainMenu();
+
                     // Create the proper view model for the chosen file
                     if (chosenPath.EndsWith(".cbz") || chosenPath.EndsWith(".cbr") || chosenPath.EndsWith(".zip") || chosenPath.EndsWith(".rar"))
                     {
@@ -128,13 +135,6 @@ namespace FuzzyComic.ViewModels
                     }
 
                     await CurrentComic.Open();
-
-                    // hide all of the buttons; we do this via opacity 0 via styles
-                    // so that they can still be hit
-                    NavigationButtonsContainer.Classes.Add("invisible");
-
-                    // also, make sure the main menu is closed
-                    this.RunCloseMainMenu();
                 }
             }
         }

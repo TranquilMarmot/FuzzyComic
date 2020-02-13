@@ -1,4 +1,5 @@
 using System.Reactive;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -77,6 +78,10 @@ namespace FuzzyComic.ViewModels.Comic
                 this.RaiseAndSetIfChanged(ref this.currentPageBitmap, value);
             }
         }
+
+        private Bitmap NextPage;
+
+        private SemaphoreSlim NextPageLock = new SemaphoreSlim(1, 1);
 
         private double progressBarWidth;
 
@@ -188,11 +193,20 @@ namespace FuzzyComic.ViewModels.Comic
         /// <param name="page">Page number to go to</param>
         public async Task GoToPage(int page)
         {
-            if (page < TotalPages && page >= 0)
+            await NextPageLock.WaitAsync();
+            try
             {
+                if (NextPage != null)
+                {
+                    CurrentPage = NextPage;
+                }
+                else if (page < TotalPages && page >= 0)
+                {
+                    CurrentPage = await LoadPage(CurrentPageIndex);
+                }
+
                 EnteredPageIndex = page + 1; // update the text box that shows the current page
                 CurrentPageIndex = page;
-                CurrentPage = await LoadPage(CurrentPageIndex);
 
                 UpdateProgressBarWidth();
 
@@ -206,6 +220,17 @@ namespace FuzzyComic.ViewModels.Comic
                 currentInfo.MangaMode = MangaMode;
                 UserSettings.CurrentSettings.comicList[FilePath] = currentInfo;
                 await UserSettings.SaveToFile();
+
+
+
+                if (page < TotalPages - 1)
+                {
+                    NextPage = await LoadPage(CurrentPageIndex + 1);
+                }
+            }
+            finally
+            {
+                NextPageLock.Release();
             }
         }
 
