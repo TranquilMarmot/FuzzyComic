@@ -193,9 +193,11 @@ namespace FuzzyComic.ViewModels.Comic
         /// <param name="page">Page number to go to</param>
         public async Task GoToPage(int page)
         {
+            System.Console.WriteLine($"Going to page {page}...");
             // can't go past the end or into the negatives
             if (page > TotalPages || page < 0)
             {
+                System.Console.WriteLine($"{page} is at the beginning or end; doing nothing");
                 return;
             }
 
@@ -206,12 +208,14 @@ namespace FuzzyComic.ViewModels.Comic
                 // then we can just use the next page that we've preloaded
                 if (NextPage != null && page == CurrentPageIndex + 1)
                 {
+                    System.Console.WriteLine($"Next page already loaded, using it");
                     CurrentPage = NextPage;
                     NextPage = null;
                 }
                 else
                 {
-                    CurrentPage = await LoadPage(CurrentPageIndex);
+                    System.Console.WriteLine($"Loading page {page}...");
+                    CurrentPage = await LoadPage(page);
                 }
 
                 EnteredPageIndex = page + 1; // update the text box that shows the current page
@@ -222,13 +226,15 @@ namespace FuzzyComic.ViewModels.Comic
                 await SaveCurrentSettings();
 
                 // if we're NOT at the end, load the next page in the background
-                if (page < TotalPages - 1)
+                if (CurrentPageIndex < TotalPages - 1)
                 {
+                    System.Console.WriteLine($"Not at end, fetching page {CurrentPageIndex} in the background");
                     NextPage = await LoadPage(CurrentPageIndex + 1);
                 }
             }
             finally
             {
+                System.Console.WriteLine("---");
                 NextPageLock.Release();
             }
         }
