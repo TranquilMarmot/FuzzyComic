@@ -14,7 +14,7 @@ namespace FuzzyComic.ViewModels
     {
         /// <summary> List of options that get passed to the file open dialog </summary>
         private static readonly List<FileDialogFilter> FileFilterList = new List<FileDialogFilter>(new[] {
-            new FileDialogFilter() { Name = "Supported Formats", Extensions = { "cbz", "cbr", "zip", "rar", "pdf" } },
+            new FileDialogFilter() { Name = "Supported Formats", Extensions = { "cbz", "cbr", "pdf" } },
             new FileDialogFilter() { Name = "Comic Book Archive", Extensions = { "cbz", "cbr" } },
             new FileDialogFilter() { Name = "Image Archive", Extensions = { "zip", "rar" } },
             new FileDialogFilter() { Name = "PDF", Extensions = { "pdf" } },
