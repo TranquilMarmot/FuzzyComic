@@ -32,6 +32,7 @@ namespace FuzzyComic.ViewModels.Comic
         /// <summary> Path that this comic lives at </summary>
         public string FilePath { get; set; }
 
+        /// <summary> Index of the current page in the list of pages </summary>
         public int CurrentPageIndex { get; set; }
 
         private int enteredPageIndex;
@@ -79,9 +80,13 @@ namespace FuzzyComic.ViewModels.Comic
             }
         }
 
+        /// <summary>
+        /// After setting `CurrentPage`, the next page will be loaded in the background.
+        /// This is mainly useful when using formats where loading pages can take a while (i.e. PDFs).
+        /// 
+        /// When the next page button is pressed, if this is not null, it will be set to be the `CurrentPage` bitmap.
+        /// </summary>
         private Bitmap NextPage;
-
-        private SemaphoreSlim NextPageLock = new SemaphoreSlim(1, 1);
 
         private double progressBarWidth;
 
@@ -157,7 +162,7 @@ namespace FuzzyComic.ViewModels.Comic
         protected BaseComicViewModel(string filePath)
         {
             FilePath = filePath;
-            DoGoToPage = ReactiveCommand.Create(RunGoToCurrentPage);
+            DoGoToPage = ReactiveCommand.Create(RunGoToCurrentlyEnteredPage);
         }
 
         /// <summary>
@@ -177,11 +182,15 @@ namespace FuzzyComic.ViewModels.Comic
                 await GoToPage(0);
             }
 
+            // setting manga mode from the settings will properly switch the buttons around
             MangaMode = currentInfo.MangaMode;
         }
 
-        /// <summary> Run when the "Go" to page button is clicked </summary>
-        private async Task RunGoToCurrentPage()
+        /// <summary>
+        /// Run when the "Go" to page button is clicked.
+        /// This will go to whatever number the user has entered into the text box on the main menu.
+        /// </summary>
+        private async Task RunGoToCurrentlyEnteredPage()
         {
             // page index starts at 0, but we want to display it as starting at 1
             await GoToPage(EnteredPageIndex - 1);
@@ -194,6 +203,7 @@ namespace FuzzyComic.ViewModels.Comic
         public async Task GoToPage(int page)
         {
             System.Console.WriteLine($"Going to page {page}...");
+
             // can't go past the end or into the negatives
             if (page > TotalPages || page < 0)
             {
@@ -201,42 +211,36 @@ namespace FuzzyComic.ViewModels.Comic
                 return;
             }
 
-            await NextPageLock.WaitAsync();
-            try
+
+            // if we have a next page and we're going forward by one (a page flip)
+            // then we can just use the next page that we've preloaded
+            if (NextPage != null && page == CurrentPageIndex + 1)
             {
-                // if we have a next page and we're going forward by one (a page flip)
-                // then we can just use the next page that we've preloaded
-                if (NextPage != null && page == CurrentPageIndex + 1)
-                {
-                    System.Console.WriteLine($"Next page already loaded, using it");
-                    CurrentPage = NextPage;
-                    NextPage = null;
-                }
-                else
-                {
-                    System.Console.WriteLine($"Loading page {page}...");
-                    CurrentPage = await LoadPage(page);
-                }
-
-                EnteredPageIndex = page + 1; // update the text box that shows the current page
-                CurrentPageIndex = page;
-
-                // update the progress bar and save the current page out to the settings file
-                UpdateProgressBarWidth();
-                await SaveCurrentSettings();
-
-                // if we're NOT at the end, load the next page in the background
-                if (CurrentPageIndex < TotalPages - 1)
-                {
-                    System.Console.WriteLine($"Not at end, fetching page {CurrentPageIndex} in the background");
-                    NextPage = await LoadPage(CurrentPageIndex + 1);
-                }
+                System.Console.WriteLine($"Next page already loaded, using it");
+                CurrentPage = NextPage;
+                NextPage = null;
             }
-            finally
+            else
             {
-                System.Console.WriteLine("---");
-                NextPageLock.Release();
+                System.Console.WriteLine($"Loading page {page}...");
+                CurrentPage = await LoadPage(page);
             }
+
+            EnteredPageIndex = page + 1; // update the text box that shows the current page
+            CurrentPageIndex = page;
+
+            // update the progress bar and save the current page out to the settings file
+            UpdateProgressBarWidth();
+            await SaveCurrentSettings();
+
+            // if we're NOT at the end, load the next page in the background
+            if (CurrentPageIndex < TotalPages - 1)
+            {
+                System.Console.WriteLine($"Not at end, fetching page {CurrentPageIndex} in the background");
+                NextPage = await LoadPage(CurrentPageIndex + 1);
+            }
+
+            System.Console.WriteLine("---");
         }
 
         /// <summary>
