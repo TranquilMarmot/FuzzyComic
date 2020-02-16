@@ -14,7 +14,7 @@ namespace FuzzyComic.ViewModels
     {
         /// <summary> List of options that get passed to the file open dialog </summary>
         private static readonly List<FileDialogFilter> FileFilterList = new List<FileDialogFilter>(new[] {
-            new FileDialogFilter() { Name = "Supported Formats", Extensions = { "cbz", "cbr", "zip", "rar", "pdf" } },
+            new FileDialogFilter() { Name = "Supported Formats", Extensions = { "cbz", "cbr", "pdf" } },
             new FileDialogFilter() { Name = "Comic Book Archive", Extensions = { "cbz", "cbr" } },
             new FileDialogFilter() { Name = "Image Archive", Extensions = { "zip", "rar" } },
             new FileDialogFilter() { Name = "PDF", Extensions = { "pdf" } },
@@ -113,6 +113,13 @@ namespace FuzzyComic.ViewModels
                         currentComic = null;
                     }
 
+                    // hide all of the buttons; we do this via opacity 0 via styles
+                    // so that they can still be hit
+                    NavigationButtonsContainer.Classes.Add("invisible");
+
+                    // also, make sure the main menu is closed
+                    this.RunCloseMainMenu();
+
                     // Create the proper view model for the chosen file
                     if (chosenPath.EndsWith(".cbz") || chosenPath.EndsWith(".cbr") || chosenPath.EndsWith(".zip") || chosenPath.EndsWith(".rar"))
                     {
@@ -128,13 +135,6 @@ namespace FuzzyComic.ViewModels
                     }
 
                     await CurrentComic.Open();
-
-                    // hide all of the buttons; we do this via opacity 0 via styles
-                    // so that they can still be hit
-                    NavigationButtonsContainer.Classes.Add("invisible");
-
-                    // also, make sure the main menu is closed
-                    this.RunCloseMainMenu();
                 }
             }
         }
