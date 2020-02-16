@@ -193,14 +193,23 @@ namespace FuzzyComic.ViewModels.Comic
         /// <param name="page">Page number to go to</param>
         public async Task GoToPage(int page)
         {
+            // can't go past the end or into the negatives
+            if (page > TotalPages || page < 0)
+            {
+                return;
+            }
+
             await NextPageLock.WaitAsync();
             try
             {
-                if (NextPage != null)
+                // if we have a next page and we're going forward by one (a page flip)
+                // then we can just use the next page that we've preloaded
+                if (NextPage != null && page == CurrentPageIndex + 1)
                 {
                     CurrentPage = NextPage;
+                    NextPage = null;
                 }
-                else if (page < TotalPages && page >= 0)
+                else
                 {
                     CurrentPage = await LoadPage(CurrentPageIndex);
                 }
@@ -208,21 +217,11 @@ namespace FuzzyComic.ViewModels.Comic
                 EnteredPageIndex = page + 1; // update the text box that shows the current page
                 CurrentPageIndex = page;
 
+                // update the progress bar and save the current page out to the settings file
                 UpdateProgressBarWidth();
+                await SaveCurrentSettings();
 
-                ComicInfo currentInfo;
-                if (!UserSettings.CurrentSettings.comicList.TryGetValue(FilePath, out currentInfo))
-                {
-                    currentInfo = new ComicInfo();
-                }
-
-                currentInfo.PageNumber = page;
-                currentInfo.MangaMode = MangaMode;
-                UserSettings.CurrentSettings.comicList[FilePath] = currentInfo;
-                await UserSettings.SaveToFile();
-
-
-
+                // if we're NOT at the end, load the next page in the background
                 if (page < TotalPages - 1)
                 {
                     NextPage = await LoadPage(CurrentPageIndex + 1);
@@ -232,6 +231,24 @@ namespace FuzzyComic.ViewModels.Comic
             {
                 NextPageLock.Release();
             }
+        }
+
+        /// <summary>
+        /// Save the current settings for this comic to the settings file.
+        /// </summary>
+        /// <param name="page">Page to save into settings</param>
+        private async Task SaveCurrentSettings()
+        {
+            ComicInfo currentInfo;
+            if (!UserSettings.CurrentSettings.comicList.TryGetValue(FilePath, out currentInfo))
+            {
+                currentInfo = new ComicInfo();
+            }
+
+            currentInfo.PageNumber = CurrentPageIndex;
+            currentInfo.MangaMode = MangaMode;
+            UserSettings.CurrentSettings.comicList[FilePath] = currentInfo;
+            await UserSettings.SaveToFile();
         }
 
         /// <summary>
