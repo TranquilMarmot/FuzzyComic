@@ -175,15 +175,15 @@ namespace FuzzyComic.ViewModels.Comic
             {
                 // we've opened this comic before; go to the page we stopped on
                 await GoToPage(currentInfo.PageNumber);
+
+                // setting manga mode from the settings will properly switch the buttons around
+                MangaMode = currentInfo.MangaMode;
             }
             else
             {
                 // fresh one, start at the beginning
                 await GoToPage(0);
             }
-
-            // setting manga mode from the settings will properly switch the buttons around
-            MangaMode = currentInfo.MangaMode;
         }
 
         /// <summary>

@@ -33,13 +33,34 @@ namespace FuzzyComic.Views
 
                 switch (args.Key)
                 {
-                    case Key.Right:
+                    // space/back always go forward/backward
                     case Key.Space:
                         await viewModel.RunNextPage();
                         break;
-                    case Key.Left:
                     case Key.Back:
                         await viewModel.RunPreviousPage();
+                        break;
+
+                    // depending on manga mode, left/right arrows change how the page changes
+                    case Key.Right:
+                        if (viewModel.CurrentComic.MangaMode)
+                        {
+                            await viewModel.RunPreviousPage();
+                        }
+                        else
+                        {
+                            await viewModel.RunNextPage();
+                        }
+                        break;
+                    case Key.Left:
+                        if (viewModel.CurrentComic.MangaMode)
+                        {
+                            await viewModel.RunNextPage();
+                        }
+                        else
+                        {
+                            await viewModel.RunPreviousPage();
+                        }
                         break;
                     case Key.Escape:
                         viewModel.RunToggleMainMenu();
