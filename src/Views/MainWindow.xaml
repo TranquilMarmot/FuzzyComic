@@ -29,27 +29,61 @@
       <Setter Property="Margin" 
         Value="5" />
     </Style>
+
+    <!-- Animation to spin the loading image -->
+    <Style Selector="Image.loading">
+      <Style.Animations>
+        <Animation Duration="0:0:2" IterationCount="INFINITE">
+          <KeyFrame Cue="0%">
+            <Setter Property="RotateTransform.Angle" Value="0.0" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="RotateTransform.Angle" Value="360.0" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+
+    <Style Selector="Image.invisible">
+      <Setter Property="Opacity" 
+        Value="0" />
+    </Style>
   </Window.Styles>
 
   <Panel>
+    <!-- Grid containing spinner image -->
+    <Grid ZIndex="2"
+      RowDefinitions="*,Auto"
+      ColumnDefinitions="Auto,*">
+        <Image
+          Source="resm:FuzzyComic.Assets.loading.png"
+          Name="loadingSpinner"
+          Grid.Row="1"
+          Grid.Column="0"
+          Classes="loading invisible"
+          Width="30"
+          Height="30"
+          Margin="10" />
+    </Grid>
+
     <Grid ZIndex="0" 
       RowDefinitions="*,Auto" 
-      ColumnDefinitions="Auto,*">
+      ColumnDefinitions="Auto,Auto,*">
       <!-- The actual real comic page!!! -->
       <Image Grid.Row="0" 
         Grid.Column="0" 
-        Grid.ColumnSpan="2" 
+        Grid.ColumnSpan="3" 
         Stretch="Uniform" 
         Source="{Binding CurrentComic.CurrentPage}" />
 
       <!-- Progress bar at bottom of screen -->
       <Rectangle Grid.Row="1" 
-        Grid.Column="0" 
+        Grid.Column="1" 
         Width="{Binding CurrentComic.ProgressBarWidth}" 
         Height="3" 
         Fill="Green" />
       <Rectangle Grid.Row="1" 
-        Grid.Column="1" 
+        Grid.Column="2" 
         Height="3" 
         Fill="White" />
     </Grid>
@@ -134,12 +168,16 @@
                 Margin="15" 
                 Background="Black" />
 
-          <CheckBox Content="Manga Mode (Swap Next/Previous)" IsChecked="{Binding CurrentComic.MangaMode, FallbackValue=false}" />
+          <!-- Checkbox to swap next/previous buttons -->
+          <CheckBox
+            Content="Manga Mode (Swap Next/Previous)"
+            IsChecked="{Binding CurrentComic.MangaMode, FallbackValue=false}" />
 
           <Separator Height="1" 
                 Width="100" 
                 Margin="15" />
 
+          <!-- Text and input to show number of pages, and a button to go to a specific page -->
           <StackPanel Orientation="Horizontal">
             <TextBlock Text="Page" />
             <TextBox Text="{Binding CurrentComic.EnteredPageIndex}" />

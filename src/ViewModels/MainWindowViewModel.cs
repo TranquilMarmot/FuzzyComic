@@ -77,6 +77,9 @@ namespace FuzzyComic.ViewModels
         /// </summary>
         public Border MainMenuPanel { get; set; }
 
+        /// <summary> Spinning image to represent loading </summary>
+        public Image LoadingSpinner { get; set; }
+
         /// <summary>
         /// Current options
         /// </summary>
@@ -85,8 +88,23 @@ namespace FuzzyComic.ViewModels
         /// <summary> Exits the application </summary>
         private void RunExit()
         {
-            // TODO show confirmation dialog
             System.Environment.Exit(0);
+        }
+
+        /// <summary>
+        /// Show/hide the loading spinner
+        /// </summary>
+        /// <param name="visible">Whether or not the spinner is visible</param>
+        private void SetLoadingSpinnerVisible(bool visible)
+        {
+            if (visible)
+            {
+                LoadingSpinner.Classes.Remove("invisible");
+            }
+            else
+            {
+                LoadingSpinner.Classes.Add("invisible");
+            }
         }
 
         /// <summary>
@@ -134,7 +152,9 @@ namespace FuzzyComic.ViewModels
                         System.Console.Error.WriteLine($"Unsupported format for file {chosenPath}!");
                     }
 
+                    SetLoadingSpinnerVisible(true);
                     await CurrentComic.Open();
+                    SetLoadingSpinnerVisible(false);
                 }
             }
         }
@@ -142,16 +162,20 @@ namespace FuzzyComic.ViewModels
         /// <summary> Go to the next page </summary>
         public async Task RunNextPage()
         {
+            SetLoadingSpinnerVisible(true);
             await CurrentComic.GoToPage(CurrentComic.CurrentPageIndex + 1);
+            SetLoadingSpinnerVisible(false);
         }
 
         /// <summary> Go to the previous page </summary>
         public async Task RunPreviousPage()
         {
+            SetLoadingSpinnerVisible(true);
             await CurrentComic.GoToPage(CurrentComic.CurrentPageIndex - 1);
+            SetLoadingSpinnerVisible(false);
         }
 
-        /// <summary> Open the main manu </summary>
+        /// <summary> Open the main menu </summary>
         public void RunOpenMainMenu()
         {
             MainMenuPanel.IsVisible = true;

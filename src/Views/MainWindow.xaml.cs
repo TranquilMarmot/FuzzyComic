@@ -56,12 +56,14 @@ namespace FuzzyComic.Views
             var navigationButtonsContainer = this.FindControl<Grid>("navigationButtonsContainer");
             var mainMenuPanel = this.FindControl<Border>("mainMenu");
             var showMainMenuButton = this.FindControl<Button>("showMainMenuButton");
+            var loadingSpinner = this.FindControl<Image>("loadingSpinner");
 
             MainWindowViewModel viewModel = (MainWindowViewModel)this.DataContext;
 
             // tell the view model about our buttons so it can manipulate their classes etc.
             viewModel.NavigationButtonsContainer = navigationButtonsContainer;
             viewModel.MainMenuPanel = mainMenuPanel;
+            viewModel.LoadingSpinner = loadingSpinner;
 
             // apply the current user settings (loaded from file when application starts)
             viewModel.CurrentOptions.MainWindow = this;
