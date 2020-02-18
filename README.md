@@ -1,5 +1,7 @@
 # FuzzyComic
 
+![Release](https://github.com/TranquilMarmot/FuzzyComic/workflows/Release/badge.svg)
+
 ## About
 
 FuzzyComic is a **simple** comic reader, tailored for use on touch-screen devices. It currently runs on Windows, Linux, and macOS.
@@ -70,3 +72,13 @@ dotnet publish -r win-x64 -c Release FuzzyComic.csproj
 **NOTE:** Running on macOS or Linux requires the user to also have [Ghostscript](https://www.ghostscript.com/download/gsdnld.html) installed to open PDFs. Image archives work out-of-the-box. See [Ghostscript/README.md](./Ghostscript/README.md) for more information.
 
 This command will output the directory that it is publishing the executable to.
+
+### Releasing
+
+See https://github.com/TranquilMarmot/FuzzyComic/releases for a list of releases.
+
+To cut a release, simply push up a tag that matches `v*` (i.e. `v1.0` or `v2.0-beta`)
+
+When a tag is pushed, GitHub actions will automatically pick it up and build artifacts for Windows, Linux, and macOS, and upload them to the release.
+
+See [.github/workflows/release.yml](./.github/workflows/release.yml) for the steps in the workflow.
