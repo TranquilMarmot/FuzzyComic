@@ -1,8 +1,6 @@
+using System.IO;
 using System.Reactive;
-using System.Threading;
 using System.Threading.Tasks;
-using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media.Imaging;
 using ReactiveUI;
 
@@ -29,8 +27,17 @@ namespace FuzzyComic.ViewModels.Comic
         /// </summary>
         public abstract void CloseStreams();
 
+        /// <summary> Delegate to use when the page change </summary>
+        public delegate void HandlePageChanged();
+
+        /// <summary> Event called when the page is changed </summary>
+        public event HandlePageChanged OnPageChanged;
+
         /// <summary> Path that this comic lives at </summary>
         public string FilePath { get; set; }
+
+        /// <summary> Name of the file </summary>
+        public string FileName { get; set; }
 
         /// <summary> Index of the current page in the list of pages </summary>
         public int CurrentPageIndex { get; set; }
@@ -87,20 +94,6 @@ namespace FuzzyComic.ViewModels.Comic
         /// When the next page button is pressed, if this is not null, it will be set to be the `CurrentPage` bitmap.
         /// </summary>
         private Bitmap NextPage;
-
-        private double progressBarWidth;
-
-        /// <summary>
-        /// Width, in pixels, of the progress bar. Will be updated whenever the page changes.
-        /// </summary>
-        public double ProgressBarWidth
-        {
-            get { return this.progressBarWidth; }
-            protected set
-            {
-                this.RaiseAndSetIfChanged(ref this.progressBarWidth, value);
-            }
-        }
 
         private int previousPageColumn = LeftMainButtonColumn;
 
@@ -162,6 +155,8 @@ namespace FuzzyComic.ViewModels.Comic
         protected BaseComicViewModel(string filePath)
         {
             FilePath = filePath;
+            FileName = Path.GetFileNameWithoutExtension(filePath);
+
             DoGoToPage = ReactiveCommand.Create(RunGoToCurrentlyEnteredPage);
         }
 
@@ -211,12 +206,11 @@ namespace FuzzyComic.ViewModels.Comic
                 return;
             }
 
-
             // if we have a next page and we're going forward by one (a page flip)
             // then we can just use the next page that we've preloaded
             if (NextPage != null && page == CurrentPageIndex + 1)
             {
-                System.Console.WriteLine($"Next page already loaded, using it");
+                System.Console.WriteLine($"Page {page} already loaded, using it");
                 CurrentPage = NextPage;
                 NextPage = null;
             }
@@ -229,18 +223,18 @@ namespace FuzzyComic.ViewModels.Comic
             EnteredPageIndex = page + 1; // update the text box that shows the current page
             CurrentPageIndex = page;
 
-            // update the progress bar and save the current page out to the settings file
-            UpdateProgressBarWidth();
+            // save the current page out to the settings file
             await SaveCurrentSettings();
 
             // if we're NOT at the end, load the next page in the background
             if (CurrentPageIndex < TotalPages - 1)
             {
-                System.Console.WriteLine($"Not at end, fetching page {CurrentPageIndex} in the background");
+                System.Console.WriteLine($"Fetching page {CurrentPageIndex + 1} in the background");
                 NextPage = await LoadPage(CurrentPageIndex + 1);
             }
 
             System.Console.WriteLine("---");
+            OnPageChanged();
         }
 
         /// <summary>
@@ -259,21 +253,6 @@ namespace FuzzyComic.ViewModels.Comic
             currentInfo.MangaMode = MangaMode;
             UserSettings.CurrentSettings.comicList[FilePath] = currentInfo;
             await UserSettings.SaveToFile();
-        }
-
-        /// <summary>
-        /// Update the width of the progress bar at the bottom of the page.
-        /// 
-        /// This should be called whenever the page changes.
-        /// </summary>
-        private void UpdateProgressBarWidth()
-        {
-            if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                var windowWidth = desktop.MainWindow.Width; // TODO On some platforms this will be NaN at startup?
-                var percentDone = (double)(CurrentPageIndex + 1) / (double)TotalPages;
-                ProgressBarWidth = windowWidth * percentDone;
-            }
         }
     }
 }

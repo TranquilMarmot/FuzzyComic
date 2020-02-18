@@ -21,6 +21,8 @@ namespace FuzzyComic.ViewModels
             new FileDialogFilter() { Name = "All", Extensions = { "*" } }
         });
 
+        private static readonly string FuzzyComic = "Fuzzy Comic";
+
         public MainWindowViewModel()
         {
             DoExit = ReactiveCommand.Create(RunExit);
@@ -45,7 +47,7 @@ namespace FuzzyComic.ViewModels
         /// <summary> Go back a page </summary>
         public ReactiveCommand<Unit, Unit> DoPreviousPage { get; }
 
-        /// <summary> Close the main meunu </summary>
+        /// <summary> Close the main menu </summary>
         public ReactiveCommand<Unit, Unit> DoCloseMainMenu { get; }
 
         /// <summary> Open the options dialog </summary>
@@ -63,6 +65,32 @@ namespace FuzzyComic.ViewModels
             set
             {
                 this.RaiseAndSetIfChanged(ref this.currentComic, value);
+            }
+        }
+
+        private string windowTitle = FuzzyComic;
+
+        /// <summary> The current title of the main window </summary>
+        public string WindowTitle
+        {
+            get { return this.windowTitle; }
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.windowTitle, value);
+            }
+        }
+
+        private double progressBarWidth;
+
+        /// <summary>
+        /// Width, in pixels, of the progress bar. Will be updated whenever the page changes.
+        /// </summary>
+        public double ProgressBarWidth
+        {
+            get { return this.progressBarWidth; }
+            protected set
+            {
+                this.RaiseAndSetIfChanged(ref this.progressBarWidth, value);
             }
         }
 
@@ -152,10 +180,27 @@ namespace FuzzyComic.ViewModels
                         System.Console.Error.WriteLine($"Unsupported format for file {chosenPath}!");
                     }
 
+                    // whenever the page changes, we want to update the window title and progress bar
+                    CurrentComic.OnPageChanged += UpdateWindowTitle;
+                    CurrentComic.OnPageChanged += UpdateProgressBarWidth;
+
                     SetLoadingSpinnerVisible(true);
                     await CurrentComic.Open();
                     SetLoadingSpinnerVisible(false);
                 }
+            }
+        }
+
+        /// <summary> Update the title of the window to reflect the current state of the application </summary>
+        public void UpdateWindowTitle()
+        {
+            if (CurrentComic != null)
+            {
+                WindowTitle = $"{CurrentComic.FileName} | {CurrentComic.CurrentPageIndex + 1} of {CurrentComic.TotalPages} | {FuzzyComic}";
+            }
+            else
+            {
+                WindowTitle = FuzzyComic;
             }
         }
 
@@ -207,7 +252,17 @@ namespace FuzzyComic.ViewModels
                 var optionsWindow = new OptionsWindow(CurrentOptions);
                 await optionsWindow.ShowDialog(desktop.MainWindow);
             }
+        }
 
+        /// <summary> Update the width of the progress bar at the bottom of the page. </summary>
+        private void UpdateProgressBarWidth()
+        {
+            if (CurrentComic != null && Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                var windowWidth = desktop.MainWindow.Width; // TODO On some platforms this will be NaN at startup?
+                var percentDone = (double)(CurrentComic.CurrentPageIndex + 1) / (double)CurrentComic.TotalPages;
+                ProgressBarWidth = windowWidth * percentDone;
+            }
         }
     }
 }
