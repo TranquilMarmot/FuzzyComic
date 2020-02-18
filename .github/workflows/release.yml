@@ -12,10 +12,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Build project
+      - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.1.101
+
+      - name: Build project
         run: |
           dotnet publish -r win-x64 -c Release FuzzyComic.csproj && \
           dotnet publish -r linux-x64 -c Release FuzzyComic.csproj && \
