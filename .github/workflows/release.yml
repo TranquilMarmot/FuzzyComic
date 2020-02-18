@@ -35,7 +35,7 @@ jobs:
           prerelease: false
 
       - name: Upload Windows Release Asset
-        id: upload-release-asset
+        id: upload-windows-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -47,7 +47,7 @@ jobs:
           asset_name: FuzzyComic_Windows.exe
           asset_content_type: application/vnd.microsoft.portable-executable
       - name: Upload Linux Release Asset
-        id: upload-release-asset
+        id: upload-linux-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,7 +57,7 @@ jobs:
           asset_name: FuzzyComic_Linux
           asset_content_type: application/octet-stream
       - name: Upload macOS Release Asset
-        id: upload-release-asset
+        id: upload-macos-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
